@@ -1,0 +1,264 @@
+<title>Math 54 Theorem Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: one textbook box centred per slide, thin control bars top and bottom, like flipping cards */
+:root{
+  --bg:#f3f4f7; --fg:#1d1f27; --muted:#626779; --line:#d8dbe4; --panel:#ffffff;
+  --thm:#6a3fb5; --thm-fill:#f3eefc; --thm-edge:#b9a2e6;
+  --fact:#23805a; --fact-fill:#ebf6ef; --fact-edge:#99cfb3;
+  --warn:#9a5b00; --warn-fill:#fff3dc;
+  --mark:#b3261e; --mark-fill:#fdeceb;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --label:"IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15161c; --fg:#e7e8ee; --muted:#9a9eb0; --line:#2c2f3b; --panel:#1d1f27;
+  --thm:#c3a6ff; --thm-fill:#231c36; --thm-edge:#5b4390;
+  --fact:#7fd8ae; --fact-fill:#152a21; --fact-edge:#2f6b50;
+  --warn:#ffc46b; --warn-fill:#33270f;
+  --mark:#ff9f96; --mark-fill:#3a1a18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15161c; --fg:#e7e8ee; --muted:#9a9eb0; --line:#2c2f3b; --panel:#1d1f27;
+  --thm:#c3a6ff; --thm-fill:#231c36; --thm-edge:#5b4390;
+  --fact:#7fd8ae; --fact-fill:#152a21; --fact-edge:#2f6b50;
+  --warn:#ffc46b; --warn-fill:#33270f;
+  --mark:#ff9f96; --mark-fill:#3a1a18; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--serif);margin:0;display:flex;flex-direction:column}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;border-bottom:1px solid var(--line);font-family:var(--label)}
+.bar.bottom{border-bottom:0;border-top:1px solid var(--line)}
+.brand{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
+select,button{font-family:var(--label);font-size:14px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:2px solid var(--thm);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.stage{flex:1;min-height:0;overflow:auto;display:flex;padding:20px 16px;touch-action:pan-y}
+.slide{margin:auto;width:100%;max-width:760px;min-width:0}
+.eyebrow{font-family:var(--label);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap}
+.box{border:1.5px solid var(--edge);background:var(--fill);border-radius:4px;padding:22px 24px;box-shadow:inset 5px 0 0 var(--ink)}
+.box.thm{--edge:var(--thm-edge);--fill:var(--thm-fill);--ink:var(--thm)}
+.box.fact{--edge:var(--fact-edge);--fill:var(--fact-fill);--ink:var(--fact)}
+.box h2{font-family:var(--label);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--ink);margin:0 0 12px;text-wrap:balance}
+.box .body{font-size:clamp(17px,2.3vw,21px);line-height:1.55}
+.box .body p{margin:0 0 .6em}.box .body p:last-child{margin-bottom:0}
+.box ol,.box ul{margin:.2em 0 .6em;padding-left:1.5em}
+.box li{margin:.15em 0}
+ol.alpha{list-style:lower-alpha}
+.tag{font-family:var(--label);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--warn-fill);color:var(--warn)}
+.tag.mark{background:var(--mark-fill);color:var(--mark)}
+button.review[aria-pressed="true"]{background:var(--mark-fill);color:var(--mark);border-color:var(--mark)}
+button:disabled{opacity:.5;cursor:default}
+.empty{margin:auto;max-width:34ch;text-align:center;color:var(--muted);font-size:18px;line-height:1.5}
+.note{font-size:15px;color:var(--muted);margin-top:14px;font-style:italic}
+.math-scroll{overflow-x:auto;max-width:100%}
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.count{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);min-width:7ch;text-align:center}
+.progress{flex:1 1 120px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;min-width:60px}
+.progress i{display:block;height:100%;background:var(--fg);width:0;transition:width .2s}
+.hint{font-size:12px;color:var(--muted)}
+@media (max-width:520px){.hint{display:none}.box{padding:18px 16px}}
+@media (prefers-reduced-motion:reduce){.progress i{transition:none}}
+</style>
+
+<div class="bar">
+  <span class="brand">Math 54 · Midterm 1 boxes</span>
+  <label for="sec" hidden>Jump to section</label>
+  <select id="sec" aria-label="Jump to section"></select>
+  <div class="seg" role="group" aria-label="Show">
+    <button id="f-all" aria-pressed="true">All</button>
+    <button id="f-thm" aria-pressed="false">Theorems</button>
+    <button id="f-fact" aria-pressed="false">Facts</button>
+  </div>
+  <button id="f-rev" class="review" aria-pressed="false">Review only (0)</button>
+</div>
+<main class="stage" id="stage" aria-live="polite"><p class="empty" id="empty" hidden>Nothing marked for review here yet. Turn off “Review only”, then press R on any slide to mark it.</p></main>
+<div class="bar bottom">
+  <button id="prev" aria-label="Previous slide">← Prev</button>
+  <span class="count" id="count">1 / 1</span>
+  <button id="next" aria-label="Next slide">Next →</button>
+  <button id="mark" class="review" aria-pressed="false">☆ Mark for review</button>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <span class="hint">← → keys, or tap the left / right side · R marks for review</span>
+</div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'},startup:{typeset:false}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<script>
+const T='thm',F='fact';
+const S=[
+// ---------- 1.1
+['1.1',F,'Solutions of a linear system',String.raw`<p>A system of linear equations has</p><ol><li>no solution, or</li><li>exactly one solution, or</li><li>infinitely many solutions.</li></ol><p>It is <b>consistent</b> if it has one or infinitely many solutions, and <b>inconsistent</b> if it has none.</p>`],
+['1.1',F,'Elementary row operations',String.raw`<ol><li>(Replacement) Replace one row by the sum of itself and a multiple of another row.</li><li>(Interchange) Interchange two rows.</li><li>(Scaling) Multiply all entries in a row by a nonzero constant.</li></ol>`],
+['1.1',F,'Row equivalence preserves solutions',String.raw`<p>If the augmented matrices of two linear systems are row equivalent, then the two systems have the same solution set.</p>`],
+['1.1',F,'Two fundamental questions about a linear system',String.raw`<ol><li>Is the system consistent; that is, does at least one solution <i>exist</i>?</li><li>If a solution exists, is it the <i>only</i> one; that is, is the solution <i>unique</i>?</li></ol>`],
+// ---------- 1.2
+['1.2',F,'Echelon form and reduced echelon form',String.raw`<p>A rectangular matrix is in <b>echelon form</b> if it has these three properties:</p><ol><li>All nonzero rows are above any rows of all zeros.</li><li>Each leading entry of a row is in a column to the right of the leading entry of the row above it.</li><li>All entries in a column below a leading entry are zeros.</li></ol><p>It is in <b>reduced echelon form</b> if, in addition:</p><ol start="4"><li>The leading entry in each nonzero row is 1.</li><li>Each leading 1 is the only nonzero entry in its column.</li></ol>`],
+['1.2',T,'Theorem 1 · Uniqueness of the Reduced Echelon Form',String.raw`<p>Each matrix is row equivalent to one and only one reduced echelon matrix.</p>`],
+['1.2',F,'Pivot position',String.raw`<p>A <b>pivot position</b> in a matrix $A$ is a location in $A$ that corresponds to a leading 1 in the reduced echelon form of $A$. A <b>pivot column</b> is a column of $A$ that contains a pivot position.</p>`],
+['1.2',T,'Theorem 2 · Existence and Uniqueness Theorem',String.raw`<p>A linear system is consistent if and only if the rightmost column of the augmented matrix is <i>not</i> a pivot column; that is, if and only if an echelon form of the augmented matrix has <i>no</i> row of the form</p>$$\begin{bmatrix}0 & \cdots & 0 & b\end{bmatrix}\quad\text{with } b\neq 0.$$<p>If a linear system is consistent, then the solution set contains either (i) a unique solution, when there are no free variables, or (ii) infinitely many solutions, when there is at least one free variable.</p>`],
+['1.2',F,'Using row reduction to solve a linear system',String.raw`<ol><li>Write the augmented matrix of the system.</li><li>Use the row reduction algorithm to obtain an equivalent augmented matrix in echelon form. Decide whether the system is consistent. If there is no solution, stop; otherwise, go to the next step.</li><li>Continue row reduction to obtain the reduced echelon form.</li><li>Write the system of equations corresponding to the matrix obtained in step 3.</li><li>Rewrite each nonzero equation from step 4 so that its one basic variable is expressed in terms of any free variables appearing in the equation.</li></ol>`],
+// ---------- 1.3
+['1.3',F,'Algebraic properties of ℝⁿ',String.raw`<p>For all $\mathbf u,\mathbf v,\mathbf w$ in $\mathbb R^n$ and all scalars $c$ and $d$:</p><ol type="i"><li>$\mathbf u+\mathbf v=\mathbf v+\mathbf u$</li><li>$(\mathbf u+\mathbf v)+\mathbf w=\mathbf u+(\mathbf v+\mathbf w)$</li><li>$\mathbf u+\mathbf 0=\mathbf 0+\mathbf u=\mathbf u$</li><li>$\mathbf u+(-\mathbf u)=-\mathbf u+\mathbf u=\mathbf 0$</li><li>$c(\mathbf u+\mathbf v)=c\mathbf u+c\mathbf v$</li><li>$(c+d)\mathbf u=c\mathbf u+d\mathbf u$</li><li>$c(d\mathbf u)=(cd)\mathbf u$</li><li>$1\mathbf u=\mathbf u$</li></ol>`],
+['1.3',F,'Vector equations and augmented matrices',String.raw`<p>A vector equation</p>$$x_1\mathbf a_1+x_2\mathbf a_2+\cdots+x_n\mathbf a_n=\mathbf b$$<p>has the same solution set as the linear system whose augmented matrix is</p>$$\begin{bmatrix}\mathbf a_1&\mathbf a_2&\cdots&\mathbf a_n&\mathbf b\end{bmatrix}.$$<p>In particular, $\mathbf b$ can be generated by a linear combination of $\mathbf a_1,\dots,\mathbf a_n$ if and only if there exists a solution to the linear system corresponding to this matrix.</p>`],
+['1.3',F,'Definition · Span',String.raw`<p>If $\mathbf v_1,\dots,\mathbf v_p$ are in $\mathbb R^n$, then the set of all linear combinations of $\mathbf v_1,\dots,\mathbf v_p$ is denoted by $\operatorname{Span}\{\mathbf v_1,\dots,\mathbf v_p\}$ and is called the <b>subset of $\mathbb R^n$ spanned</b> (or generated) by $\mathbf v_1,\dots,\mathbf v_p$. That is, it is the collection of all vectors that can be written in the form</p>$$c_1\mathbf v_1+c_2\mathbf v_2+\cdots+c_p\mathbf v_p$$<p>with $c_1,\dots,c_p$ scalars.</p>`],
+// ---------- 1.4
+['1.4',F,'Definition · The product Ax',String.raw`<p>If $A$ is an $m\times n$ matrix with columns $\mathbf a_1,\dots,\mathbf a_n$, and if $\mathbf x$ is in $\mathbb R^n$, then the product of $A$ and $\mathbf x$ is the linear combination of the columns of $A$ using the corresponding entries in $\mathbf x$ as weights:</p>$$A\mathbf x=\begin{bmatrix}\mathbf a_1&\cdots&\mathbf a_n\end{bmatrix}\begin{bmatrix}x_1\\ \vdots\\ x_n\end{bmatrix}=x_1\mathbf a_1+\cdots+x_n\mathbf a_n$$`],
+['1.4',T,'Theorem 3',String.raw`<p>If $A$ is an $m\times n$ matrix with columns $\mathbf a_1,\dots,\mathbf a_n$, and if $\mathbf b$ is in $\mathbb R^m$, the matrix equation $A\mathbf x=\mathbf b$ has the same solution set as the vector equation</p>$$x_1\mathbf a_1+\cdots+x_n\mathbf a_n=\mathbf b,$$<p>which, in turn, has the same solution set as the system of linear equations whose augmented matrix is $\begin{bmatrix}\mathbf a_1&\cdots&\mathbf a_n&\mathbf b\end{bmatrix}$.</p>`],
+['1.4',F,'Existence of solutions',String.raw`<p>The equation $A\mathbf x=\mathbf b$ has a solution if and only if $\mathbf b$ is a linear combination of the columns of $A$.</p>`],
+['1.4',T,'Theorem 4',String.raw`<p>Let $A$ be an $m\times n$ matrix. Then the following statements are logically equivalent. That is, for a particular $A$, either they are all true statements or they are all false.</p><ol class="alpha"><li>For each $\mathbf b$ in $\mathbb R^m$, the equation $A\mathbf x=\mathbf b$ has a solution.</li><li>Each $\mathbf b$ in $\mathbb R^m$ is a linear combination of the columns of $A$.</li><li>The columns of $A$ span $\mathbb R^m$.</li><li>$A$ has a pivot position in every row.</li></ol><p class="note">Theorem 4 is about a coefficient matrix, not an augmented matrix.</p>`],
+['1.4',F,'Row–vector rule for computing Ax',String.raw`<p>If the product $A\mathbf x$ is defined, then the $i$th entry in $A\mathbf x$ is the sum of the products of corresponding entries from row $i$ of $A$ and from the vector $\mathbf x$.</p>`],
+['1.4',T,'Theorem 5',String.raw`<p>If $A$ is an $m\times n$ matrix, $\mathbf u$ and $\mathbf v$ are vectors in $\mathbb R^n$, and $c$ is a scalar, then:</p><ol class="alpha"><li>$A(\mathbf u+\mathbf v)=A\mathbf u+A\mathbf v$</li><li>$A(c\mathbf u)=c(A\mathbf u)$</li></ol>`],
+// ---------- 1.5
+['1.5',F,'Nontrivial solutions of Ax = 0',String.raw`<p>The homogeneous equation $A\mathbf x=\mathbf 0$ has a nontrivial solution if and only if the equation has at least one free variable.</p>`],
+['1.5',T,'Theorem 6',String.raw`<p>Suppose the equation $A\mathbf x=\mathbf b$ is consistent for some given $\mathbf b$, and let $\mathbf p$ be a solution. Then the solution set of $A\mathbf x=\mathbf b$ is the set of all vectors of the form</p>$$\mathbf w=\mathbf p+\mathbf v_h,$$<p>where $\mathbf v_h$ is any solution of the homogeneous equation $A\mathbf x=\mathbf 0$.</p>`],
+['1.5',F,'Writing a solution set (of a consistent system) in parametric vector form',String.raw`<ol><li>Row reduce the augmented matrix to reduced echelon form.</li><li>Express each basic variable in terms of any free variables appearing in an equation.</li><li>Write a typical solution $\mathbf x$ as a vector whose entries depend on the free variables, if any.</li><li>Decompose $\mathbf x$ into a linear combination of vectors (with numeric entries) using the free variables as parameters.</li></ol>`],
+// ---------- 1.7
+['1.7',F,'Definition · Linear independence',String.raw`<p>An indexed set of vectors $\{\mathbf v_1,\dots,\mathbf v_p\}$ in $\mathbb R^n$ is said to be <b>linearly independent</b> if the vector equation</p>$$x_1\mathbf v_1+x_2\mathbf v_2+\cdots+x_p\mathbf v_p=\mathbf 0$$<p>has only the trivial solution. The set is <b>linearly dependent</b> if there exist weights $c_1,\dots,c_p$, not all zero, such that</p>$$c_1\mathbf v_1+c_2\mathbf v_2+\cdots+c_p\mathbf v_p=\mathbf 0.$$`],
+['1.7',F,'Linear independence of matrix columns',String.raw`<p>The columns of a matrix $A$ are linearly independent if and only if the equation $A\mathbf x=\mathbf 0$ has <i>only</i> the trivial solution.</p>`],
+['1.7',F,'Sets of one or two vectors',String.raw`<p>A set containing only one vector $\mathbf v$ is linearly independent if and only if $\mathbf v$ is not the zero vector.</p><p>A set of two vectors $\{\mathbf v_1,\mathbf v_2\}$ is linearly dependent if at least one of the vectors is a multiple of the other. The set is linearly independent if and only if neither of the vectors is a multiple of the other.</p>`],
+['1.7',T,'Theorem 7 · Characterization of Linearly Dependent Sets',String.raw`<p>An indexed set $S=\{\mathbf v_1,\dots,\mathbf v_p\}$ of two or more vectors is linearly dependent if and only if at least one of the vectors in $S$ is a linear combination of the others.</p><p>In fact, if $S$ is linearly dependent and $\mathbf v_1\neq\mathbf 0$, then some $\mathbf v_j$ (with $j>1$) is a linear combination of the preceding vectors, $\mathbf v_1,\dots,\mathbf v_{j-1}$.</p>`],
+['1.7',T,'Theorem 8',String.raw`<p>If a set contains more vectors than there are entries in each vector, then the set is linearly dependent. That is, any set $\{\mathbf v_1,\dots,\mathbf v_p\}$ in $\mathbb R^n$ is linearly dependent if $p>n$.</p>`],
+['1.7',T,'Theorem 9',String.raw`<p>If a set $S=\{\mathbf v_1,\dots,\mathbf v_p\}$ in $\mathbb R^n$ contains the zero vector, then the set is linearly dependent.</p>`],
+// ---------- 1.8
+['1.8',F,'Definition · Linear transformation',String.raw`<p>A transformation (or mapping) $T$ is <b>linear</b> if:</p><ol type="i"><li>$T(\mathbf u+\mathbf v)=T(\mathbf u)+T(\mathbf v)$ for all $\mathbf u,\mathbf v$ in the domain of $T$;</li><li>$T(c\mathbf u)=cT(\mathbf u)$ for all scalars $c$ and all $\mathbf u$ in the domain of $T$.</li></ol>`],
+['1.8',F,'Consequences of linearity',String.raw`<p>If $T$ is a linear transformation, then</p>$$T(\mathbf 0)=\mathbf 0$$<p>and</p>$$T(c\mathbf u+d\mathbf v)=cT(\mathbf u)+dT(\mathbf v)$$<p>for all vectors $\mathbf u,\mathbf v$ in the domain of $T$ and all scalars $c,d$. More generally (the superposition principle),</p>$$T(c_1\mathbf v_1+\cdots+c_p\mathbf v_p)=c_1T(\mathbf v_1)+\cdots+c_pT(\mathbf v_p).$$`],
+// ---------- 1.9
+['1.9',T,'Theorem 10 · The standard matrix',String.raw`<p>Let $T:\mathbb R^n\to\mathbb R^m$ be a linear transformation. Then there exists a unique matrix $A$ such that</p>$$T(\mathbf x)=A\mathbf x\quad\text{for all }\mathbf x\text{ in }\mathbb R^n.$$<p>In fact, $A$ is the $m\times n$ matrix whose $j$th column is the vector $T(\mathbf e_j)$, where $\mathbf e_j$ is the $j$th column of the identity matrix in $\mathbb R^n$:</p>$$A=\begin{bmatrix}T(\mathbf e_1)&\cdots&T(\mathbf e_n)\end{bmatrix}$$`],
+['1.9',F,'Definition · Onto',String.raw`<p>A mapping $T:\mathbb R^n\to\mathbb R^m$ is said to be <b>onto</b> $\mathbb R^m$ if each $\mathbf b$ in $\mathbb R^m$ is the image of <i>at least one</i> $\mathbf x$ in $\mathbb R^n$.</p>`],
+['1.9',F,'Definition · One-to-one',String.raw`<p>A mapping $T:\mathbb R^n\to\mathbb R^m$ is said to be <b>one-to-one</b> if each $\mathbf b$ in $\mathbb R^m$ is the image of <i>at most one</i> $\mathbf x$ in $\mathbb R^n$.</p>`],
+['1.9',T,'Theorem 11',String.raw`<p>Let $T:\mathbb R^n\to\mathbb R^m$ be a linear transformation. Then $T$ is one-to-one if and only if the equation $T(\mathbf x)=\mathbf 0$ has only the trivial solution.</p>`],
+['1.9',T,'Theorem 12',String.raw`<p>Let $T:\mathbb R^n\to\mathbb R^m$ be a linear transformation, and let $A$ be the standard matrix for $T$. Then:</p><ol class="alpha"><li>$T$ maps $\mathbb R^n$ onto $\mathbb R^m$ if and only if the columns of $A$ span $\mathbb R^m$;</li><li>$T$ is one-to-one if and only if the columns of $A$ are linearly independent.</li></ol>`],
+// ---------- 2.1
+['2.1',T,'Theorem 1 · Sums and scalar multiples',String.raw`<p>Let $A$, $B$, and $C$ be matrices of the same size, and let $r$ and $s$ be scalars.</p><ol class="alpha"><li>$A+B=B+A$</li><li>$(A+B)+C=A+(B+C)$</li><li>$A+0=A$</li><li>$r(A+B)=rA+rB$</li><li>$(r+s)A=rA+sA$</li><li>$r(sA)=(rs)A$</li></ol>`],
+['2.1',F,'Definition · Matrix multiplication',String.raw`<p>If $A$ is an $m\times n$ matrix, and if $B$ is an $n\times p$ matrix with columns $\mathbf b_1,\dots,\mathbf b_p$, then the product $AB$ is the $m\times p$ matrix whose columns are $A\mathbf b_1,\dots,A\mathbf b_p$. That is,</p>$$AB=A\begin{bmatrix}\mathbf b_1&\cdots&\mathbf b_p\end{bmatrix}=\begin{bmatrix}A\mathbf b_1&\cdots&A\mathbf b_p\end{bmatrix}$$`],
+['2.1',F,'Columns of AB',String.raw`<p>Each column of $AB$ is a linear combination of the columns of $A$ using weights from the corresponding column of $B$.</p>`],
+['2.1',F,'Row–column rule for computing AB',String.raw`<p>If the product $AB$ is defined, then the entry in row $i$ and column $j$ of $AB$ is the sum of the products of corresponding entries from row $i$ of $A$ and column $j$ of $B$. If $(AB)_{ij}$ denotes the $(i,j)$-entry in $AB$, and if $A$ is an $m\times n$ matrix, then</p>$$(AB)_{ij}=a_{i1}b_{1j}+a_{i2}b_{2j}+\cdots+a_{in}b_{nj}$$`],
+['2.1',T,'Theorem 2 · Properties of matrix multiplication',String.raw`<p>Let $A$ be an $m\times n$ matrix, and let $B$ and $C$ have sizes for which the indicated sums and products are defined.</p><ol class="alpha"><li>$A(BC)=(AB)C$ &nbsp;(associative law)</li><li>$A(B+C)=AB+AC$ &nbsp;(left distributive law)</li><li>$(B+C)A=BA+CA$ &nbsp;(right distributive law)</li><li>$r(AB)=(rA)B=A(rB)$ for any scalar $r$</li><li>$I_mA=A=AI_n$ &nbsp;(identity for matrix multiplication)</li></ol>`],
+['2.1',F,'Warnings',String.raw`<ol><li>In general, $AB\neq BA$.</li><li>The cancellation laws do <i>not</i> hold for matrix multiplication. That is, if $AB=AC$, then it is <i>not</i> true in general that $B=C$.</li><li>If a product $AB$ is the zero matrix, you <i>cannot</i> conclude in general that either $A=0$ or $B=0$.</li></ol>`],
+['2.1',T,'Theorem 3 · Transposes',String.raw`<p>Let $A$ and $B$ denote matrices whose sizes are appropriate for the following sums and products.</p><ol class="alpha"><li>$(A^T)^T=A$</li><li>$(A+B)^T=A^T+B^T$</li><li>For any scalar $r$, $(rA)^T=rA^T$</li><li>$(AB)^T=B^TA^T$</li></ol><p>The transpose of a product of matrices equals the product of their transposes in the <i>reverse</i> order.</p>`],
+// ---------- 2.2
+['2.2',T,'Theorem 4 · Inverse of a 2×2 matrix',String.raw`<p>Let $A=\begin{bmatrix}a&b\\c&d\end{bmatrix}$. If $ad-bc\neq0$, then $A$ is invertible and</p>$$A^{-1}=\frac{1}{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}$$<p>If $ad-bc=0$, then $A$ is not invertible.</p>`],
+['2.2',T,'Theorem 5',String.raw`<p>If $A$ is an invertible $n\times n$ matrix, then for each $\mathbf b$ in $\mathbb R^n$, the equation $A\mathbf x=\mathbf b$ has the unique solution $\mathbf x=A^{-1}\mathbf b$.</p>`],
+['2.2',T,'Theorem 6 · Properties of inverses',String.raw`<ol class="alpha"><li>If $A$ is an invertible matrix, then $A^{-1}$ is invertible and $(A^{-1})^{-1}=A$.</li><li>If $A$ and $B$ are $n\times n$ invertible matrices, then so is $AB$, and the inverse of $AB$ is the product of the inverses of $A$ and $B$ in the reverse order. That is, $(AB)^{-1}=B^{-1}A^{-1}$.</li><li>If $A$ is an invertible matrix, then so is $A^T$, and the inverse of $A^T$ is the transpose of $A^{-1}$. That is, $(A^T)^{-1}=(A^{-1})^T$.</li></ol><p>The product of $n\times n$ invertible matrices is invertible, and the inverse is the product of their inverses in the reverse order.</p>`],
+['2.2',F,'Elementary matrices',String.raw`<p>If an elementary row operation is performed on an $m\times n$ matrix $A$, the resulting matrix can be written as $EA$, where the $m\times m$ matrix $E$ is created by performing the same row operation on $I_m$.</p>`],
+['2.2',F,'Elementary matrices are invertible',String.raw`<p>Each elementary matrix $E$ is invertible. The inverse of $E$ is the elementary matrix of the same type that transforms $E$ back into $I$.</p>`],
+['2.2',T,'Theorem 7',String.raw`<p>An $n\times n$ matrix $A$ is invertible if and only if $A$ is row equivalent to $I_n$, and in this case, any sequence of elementary row operations that reduces $A$ to $I_n$ also transforms $I_n$ into $A^{-1}$.</p>`],
+['2.2',F,'Algorithm for finding A⁻¹',String.raw`<p>Row reduce the augmented matrix $\begin{bmatrix}A&I\end{bmatrix}$. If $A$ is row equivalent to $I$, then $\begin{bmatrix}A&I\end{bmatrix}$ is row equivalent to $\begin{bmatrix}I&A^{-1}\end{bmatrix}$. Otherwise, $A$ does not have an inverse.</p>`],
+// ---------- 2.3
+['2.3',T,'Theorem 8 · The Invertible Matrix Theorem',String.raw`<p>Let $A$ be a square $n\times n$ matrix. Then the following statements are equivalent. That is, for a given $A$, the statements are either all true or all false.</p><ol class="alpha" style="columns:2 16rem;column-gap:2rem"><li>$A$ is an invertible matrix.</li><li>$A$ is row equivalent to the $n\times n$ identity matrix.</li><li>$A$ has $n$ pivot positions.</li><li>The equation $A\mathbf x=\mathbf 0$ has only the trivial solution.</li><li>The columns of $A$ form a linearly independent set.</li><li>The linear transformation $\mathbf x\mapsto A\mathbf x$ is one-to-one.</li><li>The equation $A\mathbf x=\mathbf b$ has at least one solution for each $\mathbf b$ in $\mathbb R^n$.</li><li>The columns of $A$ span $\mathbb R^n$.</li><li>The linear transformation $\mathbf x\mapsto A\mathbf x$ maps $\mathbb R^n$ onto $\mathbb R^n$.</li><li>There is an $n\times n$ matrix $C$ such that $CA=I$.</li><li>There is an $n\times n$ matrix $D$ such that $AD=I$.</li><li>$A^T$ is an invertible matrix.</li></ol><p class="note">Chapter 3 adds one more: $\det A\neq0$ (§3.2 Theorem 4).</p>`],
+['2.3',F,'One-sided inverse is enough',String.raw`<p>Let $A$ and $B$ be square matrices. If $AB=I$, then $A$ and $B$ are both invertible, with $B=A^{-1}$ and $A=B^{-1}$.</p>`],
+['2.3',F,'Definition · Invertible linear transformation',String.raw`<p>A linear transformation $T:\mathbb R^n\to\mathbb R^n$ is said to be <b>invertible</b> if there exists a function $S:\mathbb R^n\to\mathbb R^n$ such that</p>$$S(T(\mathbf x))=\mathbf x\ \text{ for all }\mathbf x\text{ in }\mathbb R^n,\qquad T(S(\mathbf x))=\mathbf x\ \text{ for all }\mathbf x\text{ in }\mathbb R^n.$$`],
+['2.3',T,'Theorem 9',String.raw`<p>Let $T:\mathbb R^n\to\mathbb R^n$ be a linear transformation and let $A$ be the standard matrix for $T$. Then $T$ is invertible if and only if $A$ is an invertible matrix. In that case, the linear transformation $S$ given by $S(\mathbf x)=A^{-1}\mathbf x$ is the unique function satisfying $S(T(\mathbf x))=\mathbf x$ and $T(S(\mathbf x))=\mathbf x$ for all $\mathbf x$.</p>`],
+// ---------- 3.1
+['3.1',F,'Definition · Determinant',String.raw`<p>For $n\ge2$, the <b>determinant</b> of an $n\times n$ matrix $A=[a_{ij}]$ is the sum of $n$ terms of the form $\pm a_{1j}\det A_{1j}$, with plus and minus signs alternating, where the entries $a_{11},a_{12},\dots,a_{1n}$ are from the first row of $A$:</p>$$\det A=a_{11}\det A_{11}-a_{12}\det A_{12}+\cdots+(-1)^{1+n}a_{1n}\det A_{1n}=\sum_{j=1}^n(-1)^{1+j}a_{1j}\det A_{1j}$$<p class="note">$A_{ij}$ is $A$ with row $i$ and column $j$ deleted.</p>`],
+['3.1',F,'Cofactors',String.raw`<p>The $(i,j)$-<b>cofactor</b> of $A$ is the number</p>$$C_{ij}=(-1)^{i+j}\det A_{ij}.$$<p>Then $\det A=a_{11}C_{11}+a_{12}C_{12}+\cdots+a_{1n}C_{1n}$, the cofactor expansion across the first row.</p>`],
+['3.1',T,'Theorem 1 · Cofactor expansion',String.raw`<p>The determinant of an $n\times n$ matrix $A$ can be computed by a cofactor expansion across any row or down any column. The expansion across the $i$th row is</p>$$\det A=a_{i1}C_{i1}+a_{i2}C_{i2}+\cdots+a_{in}C_{in}$$<p>The cofactor expansion down the $j$th column is</p>$$\det A=a_{1j}C_{1j}+a_{2j}C_{2j}+\cdots+a_{nj}C_{nj}$$`],
+['3.1',T,'Theorem 2',String.raw`<p>If $A$ is a triangular matrix, then $\det A$ is the product of the entries on the main diagonal of $A$.</p>`],
+// ---------- 3.2
+['3.2',T,'Theorem 3 · Row Operations',String.raw`<p>Let $A$ be a square matrix.</p><ol class="alpha"><li>If a multiple of one row of $A$ is added to another row to produce a matrix $B$, then $\det B=\det A$.</li><li>If two rows of $A$ are interchanged to produce $B$, then $\det B=-\det A$.</li><li>If one row of $A$ is multiplied by $k$ to produce $B$, then $\det B=k\cdot\det A$.</li></ol>`],
+['3.2',F,'Determinant from an echelon form',String.raw`<p>Suppose $A$ has been reduced to an echelon form $U$ by row replacements and $r$ row interchanges (no scaling). Then</p>$$\det A=\begin{cases}(-1)^r\cdot\left(\text{product of pivots in }U\right) & \text{when }A\text{ is invertible}\\[4pt] 0 & \text{when }A\text{ is not invertible}\end{cases}$$`],
+['3.2',T,'Theorem 4',String.raw`<p>A square matrix $A$ is invertible if and only if $\det A\neq0$.</p>`],
+['3.2',T,'Theorem 5',String.raw`<p>If $A$ is an $n\times n$ matrix, then $\det A^T=\det A$.</p><p class="note">So Theorem 3 also holds with "row" replaced by "column".</p>`],
+['3.2',T,'Theorem 6 · Multiplicative Property',String.raw`<p>If $A$ and $B$ are $n\times n$ matrices, then $\det AB=(\det A)(\det B)$.</p>`],
+['3.2',F,'Linearity property of the determinant',String.raw`<p>The determinant is linear in each column when the other columns are held fixed. For fixed $\mathbf a_1,\dots,\mathbf a_{j-1},\mathbf a_{j+1},\dots,\mathbf a_n$, the function</p>$$T(\mathbf x)=\det\begin{bmatrix}\mathbf a_1&\cdots&\mathbf a_{j-1}&\mathbf x&\mathbf a_{j+1}&\cdots&\mathbf a_n\end{bmatrix}$$<p>satisfies $T(c\mathbf x)=cT(\mathbf x)$ and $T(\mathbf u+\mathbf v)=T(\mathbf u)+T(\mathbf v)$.</p><p class="note">It is <i>not</i> linear in the whole matrix: in general $\det(A+B)\neq\det A+\det B$.</p>`],
+// ---------- 3.3
+['3.3',T,'Theorem 7 · Cramer’s Rule',String.raw`<p>Let $A$ be an invertible $n\times n$ matrix. For any $\mathbf b$ in $\mathbb R^n$, the unique solution $\mathbf x$ of $A\mathbf x=\mathbf b$ has entries given by</p>$$x_i=\frac{\det A_i(\mathbf b)}{\det A},\qquad i=1,2,\dots,n$$<p class="note">$A_i(\mathbf b)$ is $A$ with column $i$ replaced by $\mathbf b$.</p>`,'nt'],
+['3.3',T,'Theorem 8 · An Inverse Formula',String.raw`<p>Let $A$ be an invertible $n\times n$ matrix. Then</p>$$A^{-1}=\frac{1}{\det A}\operatorname{adj}A$$<p>where the <b>adjugate</b> $\operatorname{adj}A$ is the transpose of the matrix of cofactors:</p>$$\operatorname{adj}A=\begin{bmatrix}C_{11}&C_{21}&\cdots&C_{n1}\\C_{12}&C_{22}&\cdots&C_{n2}\\ \vdots&\vdots&&\vdots\\C_{1n}&C_{2n}&\cdots&C_{nn}\end{bmatrix}$$`],
+['3.3',T,'Theorem 9 · Determinants as area or volume',String.raw`<p>If $A$ is a $2\times2$ matrix, the area of the parallelogram determined by the columns of $A$ is $|\det A|$. If $A$ is a $3\times3$ matrix, the volume of the parallelepiped determined by the columns of $A$ is $|\det A|$.</p>`],
+['3.3',T,'Theorem 10 · Linear transformations and area',String.raw`<p>Let $T:\mathbb R^2\to\mathbb R^2$ be the linear transformation determined by a $2\times2$ matrix $A$. If $S$ is a parallelogram in $\mathbb R^2$, then</p>$$\{\text{area of }T(S)\}=|\det A|\cdot\{\text{area of }S\}$$<p>If $T$ is determined by a $3\times3$ matrix $A$, and if $S$ is a parallelepiped in $\mathbb R^3$, then</p>$$\{\text{volume of }T(S)\}=|\det A|\cdot\{\text{volume of }S\}$$<p class="note">The conclusion holds for any region in ℝ² with finite area, or in ℝ³ with finite volume.</p>`],
+// ---------- 4.1
+['4.1',F,'Definition · Vector space',String.raw`<p>A <b>vector space</b> is a nonempty set $V$ of objects, called <i>vectors</i>, on which are defined two operations, called <i>addition</i> and <i>multiplication by scalars</i> (real numbers), subject to the ten axioms below. The axioms must hold for all $\mathbf u,\mathbf v,\mathbf w$ in $V$ and all scalars $c$ and $d$.</p><ol style="columns:2 15rem;column-gap:2rem"><li>$\mathbf u+\mathbf v$ is in $V$.</li><li>$\mathbf u+\mathbf v=\mathbf v+\mathbf u$.</li><li>$(\mathbf u+\mathbf v)+\mathbf w=\mathbf u+(\mathbf v+\mathbf w)$.</li><li>There is a zero vector $\mathbf 0$ in $V$ such that $\mathbf u+\mathbf 0=\mathbf u$.</li><li>For each $\mathbf u$ in $V$, there is a vector $-\mathbf u$ in $V$ such that $\mathbf u+(-\mathbf u)=\mathbf 0$.</li><li>$c\mathbf u$ is in $V$.</li><li>$c(\mathbf u+\mathbf v)=c\mathbf u+c\mathbf v$.</li><li>$(c+d)\mathbf u=c\mathbf u+d\mathbf u$.</li><li>$c(d\mathbf u)=(cd)\mathbf u$.</li><li>$1\mathbf u=\mathbf u$.</li></ol>`],
+['4.1',F,'Consequences of the axioms',String.raw`<p>For each $\mathbf u$ in $V$ and scalar $c$,</p>$$0\mathbf u=\mathbf 0,\qquad c\mathbf 0=\mathbf 0,\qquad -\mathbf u=(-1)\mathbf u.$$`],
+['4.1',F,'Definition · Subspace',String.raw`<p>A <b>subspace</b> of a vector space $V$ is a subset $H$ of $V$ that has three properties:</p><ol class="alpha"><li>The zero vector of $V$ is in $H$.</li><li>$H$ is closed under vector addition. That is, for each $\mathbf u$ and $\mathbf v$ in $H$, the sum $\mathbf u+\mathbf v$ is in $H$.</li><li>$H$ is closed under multiplication by scalars. That is, for each $\mathbf u$ in $H$ and each scalar $c$, the vector $c\mathbf u$ is in $H$.</li></ol>`],
+['4.1',T,'Theorem 1',String.raw`<p>If $\mathbf v_1,\dots,\mathbf v_p$ are in a vector space $V$, then $\operatorname{Span}\{\mathbf v_1,\dots,\mathbf v_p\}$ is a subspace of $V$.</p><p class="note">$\operatorname{Span}\{\mathbf v_1,\dots,\mathbf v_p\}$ is called the subspace spanned (or generated) by $\mathbf v_1,\dots,\mathbf v_p$.</p>`],
+];
+
+const stage=document.getElementById('stage');
+const els=S.map(([sec,kind,title,body,nt],i)=>{
+  const d=document.createElement('article');d.className='slide';d.hidden=true;
+  d.innerHTML=`<div class="eyebrow"><span>§${sec}</span><span>·</span><span>${kind===T?'Theorem box':'Fact box'}</span>${nt?'<span class="tag">Not tested · for intuition</span>':''}<span class="tag mark" hidden>★ Marked for review</span></div>
+  <section class="box ${kind}"><h2>${title}</h2><div class="body">${body}</div></section>`;
+  stage.appendChild(d);return d;
+});
+let filter='all',order=[],pos=0;
+// Marks are keyed by section+title, not slide index, so they survive slides being added or reordered
+const MARKS_KEY='m54deck-marks',MARK_SHORTCUT='r';
+const keyOf=i=>`${S[i][0]}|${S[i][2]}`;
+let marks=new Set(),reviewOnly=false,cur=0;
+try{marks=new Set(JSON.parse(localStorage.getItem(MARKS_KEY))||[])}catch(e){}
+const markBtn=document.getElementById('mark'),revBtn=document.getElementById('f-rev'),emptyEl=document.getElementById('empty');
+const secSel=document.getElementById('sec');
+function rebuild(keepIdx){
+  order=S.map((s,i)=>i).filter(i=>(filter==='all'||S[i][1]===filter)&&(!reviewOnly||marks.has(keyOf(i))));
+  const secs=[...new Set(order.map(i=>S[i][0]))];
+  secSel.innerHTML=secs.map(s=>`<option value="${s}">§${s}</option>`).join('');
+  const p=order.indexOf(keepIdx);pos=p>=0?p:Math.max(0,order.findIndex(i=>i>keepIdx));
+  if(pos<0)pos=0;show();
+}
+/* Reflects the mark state in the slide tag, the toggle button and the review counter */
+function paintMarks(i){
+  const on=i!==undefined&&marks.has(keyOf(i));
+  if(i!==undefined)els[i].querySelector('.tag.mark').hidden=!on;
+  markBtn.disabled=i===undefined;
+  markBtn.setAttribute('aria-pressed',on);
+  markBtn.textContent=on?'★ Marked for review':'☆ Mark for review';
+  // Count only marks that match a slide, so stale keys from an older deck don't inflate the number
+  revBtn.textContent=`Review only (${S.filter((s,j)=>marks.has(keyOf(j))).length})`;
+}
+function toggleMark(){
+  if(!order.length)return;
+  const k=keyOf(order[pos]);
+  if(marks.has(k))marks.delete(k);else marks.add(k);
+  try{localStorage.setItem(MARKS_KEY,JSON.stringify([...marks]))}catch(e){}
+  // In review mode an unmarked card must leave the pile, so re-filter instead of repainting
+  if(reviewOnly)rebuild(cur);else show();
+}
+function show(){
+  els.forEach(e=>e.hidden=true);
+  emptyEl.hidden=order.length>0;
+  if(!order.length){
+    document.getElementById('count').textContent='0 / 0';
+    document.getElementById('bar').style.width='0';
+    paintMarks();return;
+  }
+  const i=cur=order[pos];els[i].hidden=false;stage.scrollTop=0;
+  paintMarks(i);
+  document.getElementById('count').textContent=`${pos+1} / ${order.length}`;
+  document.getElementById('bar').style.width=((pos+1)/order.length*100)+'%';
+  secSel.value=S[i][0];
+  try{localStorage.setItem('m54deck',String(i))}catch(e){}
+}
+function go(d){if(!order.length)return;pos=Math.min(order.length-1,Math.max(0,pos+d));show()}
+document.getElementById('prev').onclick=()=>go(-1);
+document.getElementById('next').onclick=()=>go(1);
+secSel.onchange=()=>{pos=order.findIndex(i=>S[i][0]===secSel.value);show()};
+[['f-all','all'],['f-thm',T],['f-fact',F]].forEach(([id,f])=>{
+  document.getElementById(id).onclick=()=>{filter=f;document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.id===id));rebuild(cur)};
+});
+markBtn.onclick=toggleMark;
+revBtn.onclick=()=>{reviewOnly=!reviewOnly;revBtn.setAttribute('aria-pressed',reviewOnly);rebuild(cur)};
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT')return;
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
+  else if(e.key.toLowerCase()===MARK_SHORTCUT&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();toggleMark()}
+  else if(e.key==='Home'){pos=0;show()}else if(e.key==='End'){pos=order.length-1;show()}
+});
+stage.addEventListener('click',e=>{
+  if(window.getSelection&&String(window.getSelection()).length)return;
+  const r=stage.getBoundingClientRect();const x=(e.clientX-r.left)/r.width;
+  if(x<0.3)go(-1);else if(x>0.7)go(1);
+});
+let tx=null,ty=null;
+stage.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){go(dx<0?1:-1);e.preventDefault()}tx=null},{passive:false});
+let start=0;try{const v=parseInt(localStorage.getItem('m54deck'),10);if(v>=0&&v<S.length)start=v}catch(e){}
+rebuild(start);
+function typeset(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([stage]).catch(()=>{})}
+if(window.MathJax&&MathJax.startup&&MathJax.startup.promise)MathJax.startup.promise.then(typeset);else window.addEventListener('load',typeset);
+</script>
