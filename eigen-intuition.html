@@ -1,0 +1,1284 @@
+<title>Lines That Stay Put</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: masthead, then a two-column shell: a numbered stop rail beside one stop at a time
+   (idea, live figure with a text readout, notice / try it, what it builds). The rail becomes a scrolling strip on phones. */
+:root{
+  --paper:#eef2f5; --sheet:#fbfcfd; --ink:#15202b; --muted:#566475; --rule:#d3dae2; --grid:#e4e9ef; --axis:#9ba7b5;
+  --x:#1c5fc4; --ax:#b5500b; --eig:#7638c2;
+  --ok:#17784a; --ok-fill:#e1f2e9; --bad:#b0281f; --bad-fill:#fbe8e6; --hint:#875900; --hint-fill:#fdf0d3;
+  --focus:#1c5fc4;
+  --display:"Newsreader","Iowan Old Style",Georgia,serif;
+  --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0e1217; --sheet:#151b22; --ink:#e2e8ef; --muted:#9aa7b6; --rule:#28313c; --grid:#1e2630; --axis:#4a5665;
+  --x:#72a9ff; --ax:#ff9e52; --eig:#c09cff;
+  --ok:#6fd3a0; --ok-fill:#11281d; --bad:#ff8b80; --bad-fill:#33171a; --hint:#f7c56a; --hint-fill:#2e230d;
+  --focus:#72a9ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1217; --sheet:#151b22; --ink:#e2e8ef; --muted:#9aa7b6; --rule:#28313c; --grid:#1e2630; --axis:#4a5665;
+  --x:#72a9ff; --ax:#ff9e52; --eig:#c09cff;
+  --ok:#6fd3a0; --ok-fill:#11281d; --bad:#ff8b80; --bad-fill:#33171a; --hint:#f7c56a; --hint-fill:#2e230d;
+  --focus:#72a9ff; color-scheme:dark}
+
+body{background:var(--paper);color:var(--ink);font:400 1.0625rem/1.6 var(--sans);margin:0}
+a{color:var(--x)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.skip{position:absolute;left:-9999px;top:8px;z-index:20;background:var(--sheet);color:var(--ink);padding:8px 12px;border:2px solid var(--focus);border-radius:6px}
+.skip:focus{left:max(16px,env(safe-area-inset-left,0px))}
+.cx{color:var(--x)} .cax{color:var(--ax)} .ceig{color:var(--eig)}
+.mono{font-family:var(--mono);font-size:.92em}
+
+/* masthead */
+.mast{background:var(--sheet);border-bottom:1px solid var(--rule)}
+.mast-in{max-width:1240px;margin:0 auto;padding-block:22px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 28px;align-items:center}
+.brand{display:flex;gap:14px;align-items:center}
+.brand svg{width:48px;height:48px;flex:none}
+.kicker{font:600 .72rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+h1{font:italic 500 clamp(1.9rem,3.4vw,2.6rem)/1.02 var(--display);margin:0;letter-spacing:-.01em}
+.mast-sub{margin:0;color:var(--muted);font-size:.95rem;max-width:62ch}
+.tools{display:grid;gap:6px;justify-items:end}
+.tools small{color:var(--muted);font-size:.78rem;max-width:30ch;text-align:right;line-height:1.35}
+@media (max-width:900px){.mast-in{grid-template-columns:minmax(0,1fr)}.tools{justify-items:start}.tools small{text-align:left;max-width:none}}
+
+/* shell + rail */
+.shell{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:232px minmax(0,1fr);gap:32px;padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail{min-width:0}
+.rail ol{list-style:none;margin:0;padding:0;display:grid;gap:4px;position:sticky;top:20px}
+.rail li{position:relative}
+.rail a{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:center;padding:7px 8px;border-radius:8px;color:var(--ink);text-decoration:none}
+.rail a:hover{background:color-mix(in srgb,var(--sheet) 70%,transparent)}
+.rail li:not(:last-child) a::after{content:"";position:absolute;left:20.5px;top:calc(50% + 13px);height:calc(100% - 22px);border-left:1.5px solid var(--rule)}
+.rail .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--rule);font:500 .8rem/1 var(--mono);background:var(--sheet);color:var(--muted)}
+.rail .t{display:grid;gap:1px;font-size:.92rem;line-height:1.25;min-width:0}
+.rail .sec{font:600 .66rem/1.2 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.rail a[aria-current="step"]{background:var(--sheet);box-shadow:0 0 0 1px var(--rule)}
+.rail a[aria-current="step"] .n{border-color:var(--eig);color:var(--eig);border-width:2px}
+.rail a.done .n{background:var(--ok);border-color:var(--ok);color:var(--sheet)}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:18px;padding-block:14px 48px}
+  .rail{overflow-x:auto;margin-inline:-4px;padding:2px 4px 6px}
+  .rail ol{position:static;display:flex;gap:6px;width:max-content}
+  .rail a{grid-template-columns:26px auto;padding:6px 10px 6px 6px;background:var(--sheet);box-shadow:0 0 0 1px var(--rule)}
+  .rail li:not(:last-child) a::after{display:none}
+  .rail .t{font-size:.85rem;white-space:nowrap}
+}
+
+/* a stop */
+main{min-width:0;outline:none}
+.stop{display:grid;gap:22px;min-width:0}
+.eyebrow{font:600 .74rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--eig);margin:0}
+.stop h2{font:italic 500 clamp(1.65rem,3vw,2.25rem)/1.12 var(--display);margin:-8px 0 0;text-wrap:balance;outline:none}
+.lede{margin:0;max-width:66ch;font-size:1.06rem}
+.lab{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:18px}
+.lab.wide{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lab.wide .controls{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));align-items:start}
+@media (max-width:760px){.lab,.lab.wide{grid-template-columns:minmax(0,1fr);padding:14px}}
+.fig{margin:0;display:grid;gap:10px;align-content:start;min-width:0}
+.figlabel{font:600 .7rem/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fig svg{display:block;width:100%;height:auto;max-width:540px;aspect-ratio:1;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.fig svg.plot{aspect-ratio:400/260}
+.readout{display:grid;gap:5px;font-size:.95rem;line-height:1.45;min-height:4.4em}
+.readout .pair{display:flex;flex-wrap:wrap;gap:2px 18px;font-family:var(--mono);font-size:.88rem}
+.verdict.yes{color:var(--ok);font-weight:500}
+.hintline{color:var(--hint)}
+.controls{display:grid;gap:16px;align-content:start;min-width:0}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
+legend,.ctl-label{font:600 .72rem/1.2 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0;margin-bottom:8px}
+.ctl{display:grid;gap:6px}
+.ctl label{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:.95rem}
+.ctl output{font:500 .9rem var(--mono);color:var(--ink)}
+input[type=range]{width:100%;margin:0;accent-color:var(--eig);min-height:28px}
+select,button,input[type=number]{font:500 .92rem/1.2 var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:7px}
+select{padding:8px 10px;max-width:100%;min-height:40px}
+button{padding:8px 13px;min-height:40px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.checks{display:grid;gap:6px;font-size:.95rem}
+.checks label{display:flex;gap:9px;align-items:center;cursor:pointer}
+.checks input{width:18px;height:18px;accent-color:var(--eig)}
+.matin{display:inline-grid;grid-template-columns:repeat(2,minmax(0,4.6rem));gap:6px 10px;padding:6px 14px;position:relative;justify-self:start;color:var(--muted)}
+.matin input{width:100%;font:500 1rem var(--mono);text-align:center;padding:6px 2px;background:var(--paper);color:var(--ink)}
+.mat{display:inline-grid;grid-template-columns:repeat(2,auto);gap:1px 14px;padding:3px 11px;position:relative;font:500 .95rem/1.4 var(--mono);text-align:right;vertical-align:middle}
+.matin::before,.matin::after,.mat::before,.mat::after{content:"";position:absolute;top:0;bottom:0;width:6px;border:1.5px solid currentColor}
+.matin::before,.mat::before{left:0;border-right:0}
+.matin::after,.mat::after{right:0;border-left:0}
+.mat.col1>span:nth-child(odd),.mat.col2>span:nth-child(even){color:var(--ax);font-weight:600}
+.eq{font-family:var(--mono);font-size:.92rem;white-space:nowrap}
+.mrow{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mats{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 .8rem/1.1 var(--sans);padding:5px 10px;border-radius:99px;background:var(--paper);color:var(--muted);box-shadow:inset 0 0 0 1px var(--rule)}
+.chip.ok{background:var(--ok-fill);color:var(--ok);box-shadow:none}
+.chip.bad{background:var(--bad-fill);color:var(--bad);box-shadow:none}
+.chip.hint{background:var(--hint-fill);color:var(--hint);box-shadow:none}
+.pipeline{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font:500 .9rem/1.3 var(--mono);color:var(--muted)}
+.pipeline b{color:var(--ink);font-weight:500}
+.pipeline i{font-style:normal;color:var(--eig)}
+table.mini{border-collapse:collapse;font-size:.9rem;width:100%}
+table.mini th,table.mini td{padding:5px 8px;border-bottom:1px solid var(--rule);text-align:left}
+table.mini th{font:600 .7rem/1.2 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+table.mini td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.meter{display:flex;align-items:center;gap:8px;font-size:.93rem}
+.pip{width:14px;height:14px;border-radius:50%;border:2px solid var(--eig)}
+.pip.on{background:var(--eig)}
+dl.inv{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:4px 22px;margin:0}
+dl.inv dt{font:600 .68rem/1.2 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+dl.inv dd{margin:0;font:500 .95rem var(--mono)}
+.panel{display:grid;gap:12px;align-content:start;min-width:0}
+.panel p{margin:0}
+
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:760px){.cols{grid-template-columns:minmax(0,1fr)}}
+.cols h3,.earns h3,.quizhead h3{font:600 .74rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px;color:var(--muted)}
+.notice ul{margin:0;padding-left:1.15em;display:grid;gap:7px}
+.tryit{border:1.5px dashed var(--rule);border-radius:12px;padding:16px 18px;display:grid;gap:10px;align-content:start}
+.tryit h3{margin:0}
+.tryit p{margin:0}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.task{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start}
+.task .box{width:18px;height:18px;margin-top:3px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center;font:700 .75rem/1 var(--sans);color:var(--sheet)}
+.task.done .box{background:var(--ok);border-color:var(--ok)}
+.task.done .box::after{content:"✓"}
+.task.done .ttext{color:var(--muted)}
+.status{font-size:.93rem;color:var(--muted)}
+.status b{color:var(--ink)}
+.earns{border-top:2px solid var(--eig);padding-top:14px;display:grid;gap:10px;max-width:78ch}
+.earns h3{color:var(--eig)}
+.earns p{margin:0}
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid var(--rule);padding-top:18px;margin-top:26px}
+.where{font:500 .85rem var(--mono);color:var(--muted)}
+
+/* recap */
+.path{margin:0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:p}
+.path li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;counter-increment:p}
+.path li::before{content:counter(p);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:500 .85rem var(--mono);border:1.5px solid var(--eig);color:var(--eig)}
+.path a{font-size:.9rem}
+.quizhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px}
+#quiz{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.q{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:8px;box-shadow:inset 4px 0 0 var(--rule)}
+.q.right{box-shadow:inset 4px 0 0 var(--ok)}
+.q.wrong{box-shadow:inset 4px 0 0 var(--bad)}
+.q p{margin:0}
+.qf:empty{display:none}
+.q.right .qf b{color:var(--ok)} .q.wrong .qf b{color:var(--bad)}
+
+/* svg marks */
+.gl{stroke:var(--grid);stroke-width:1}
+.axis{stroke:var(--axis);stroke-width:1.3}
+.xline{stroke:var(--x);stroke-width:1.3;stroke-dasharray:6 5;opacity:.8}
+.drop{stroke:var(--ax);stroke-width:1.6;stroke-dasharray:3 3}
+.footdot{fill:var(--ax)}
+.band{stroke:var(--eig);stroke-opacity:.17;stroke-width:16}
+.bandcore{stroke:var(--eig);stroke-width:1.3;stroke-opacity:.9}
+.wash{fill:var(--eig);fill-opacity:.08}
+.elat{stroke:var(--eig);stroke-opacity:.2;stroke-width:1}
+.arr line{stroke-width:2.8;stroke-linecap:round}
+.arr.thin line{stroke-width:1.9}
+.arr polygon{stroke-width:1;stroke-linejoin:round}
+.arr circle{stroke:none}
+.vx{stroke:var(--x);fill:var(--x)}
+.vax{stroke:var(--ax);fill:var(--ax)}
+.vax.faint{opacity:.45}
+.ring-x{fill:none;stroke:var(--x);stroke-opacity:.5;stroke-dasharray:2 4;stroke-width:1.3}
+.ring-ax{fill:none;stroke:var(--ax);stroke-opacity:.65;stroke-width:1.3}
+.conn{stroke:var(--muted);stroke-opacity:.45;stroke-width:1}
+.shape-x{fill:none;stroke:var(--x);stroke-width:1.5;stroke-dasharray:4 3}
+.shape-ax{fill:var(--ax);fill-opacity:.2;stroke:var(--ax);stroke-width:1.8;stroke-linejoin:round}
+.par{fill:var(--ax);fill-opacity:.15;stroke:var(--ax);stroke-width:1.5;stroke-linejoin:round}
+.decomp{stroke:var(--eig);stroke-width:1.7;stroke-dasharray:5 4;fill:none}
+.trail{fill:none;stroke:var(--ax);stroke-opacity:.55;stroke-width:1.4}
+.tdot{fill:var(--ax)}
+.lbl{font:600 13px var(--sans);paint-order:stroke;stroke:var(--sheet);stroke-width:4px;stroke-linejoin:round}
+.lbl.x{fill:var(--x)} .lbl.ax{fill:var(--ax)} .lbl.eig{fill:var(--eig)} .lbl.mut{fill:var(--muted)}
+.handle{cursor:grab;touch-action:none;outline:none}
+.handle .hit{fill:transparent}
+.handle .knob{fill:var(--sheet);stroke:var(--x);stroke-width:3}
+.handle .ring{fill:none;stroke:var(--focus);stroke-width:3;opacity:0}
+.handle:focus-visible .ring{opacity:1}
+.pl-grid{stroke:var(--grid);stroke-width:1}
+.pl-zero{stroke:var(--axis);stroke-width:1.4}
+.pl-curve{fill:none;stroke:var(--eig);stroke-width:2.4;stroke-linejoin:round}
+.pl-mark{stroke:var(--x);stroke-width:1.4;stroke-dasharray:4 4}
+.pl-dot{fill:var(--x);stroke:var(--sheet);stroke-width:2}
+.pl-root{fill:var(--ok);stroke:var(--sheet);stroke-width:2}
+.pl-tick{font:400 11px var(--mono);fill:var(--muted)}
+.pl-ax{font:600 12px var(--sans);fill:var(--muted);paint-order:stroke;stroke:var(--sheet);stroke-width:4px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<a class="skip" href="#stage">Skip to the current stop</a>
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><line x1="4" y1="40" x2="44" y2="8" stroke="var(--eig)" stroke-width="7" stroke-opacity=".2"/><line x1="4" y1="40" x2="44" y2="8" stroke="var(--eig)" stroke-width="1.5"/><line x1="24" y1="24" x2="35" y2="15.2" stroke="var(--ax)" stroke-width="3" stroke-linecap="round"/><line x1="24" y1="24" x2="29" y2="20" stroke="var(--x)" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="2.5" fill="var(--ink)"/></svg>
+      <div><p class="kicker">Math 54 · §5.1–5.4</p><h1>Lines That Stay Put</h1></div>
+    </div>
+    <p class="mast-sub">An intuition path from eigenvectors to change of basis. Every figure is live: drag, slide or use the arrow keys, and each one describes itself in words underneath. <a href="https://claude.ai/artifact/8i4SAz3eLtrqhLwUui29yb" target="_blank" rel="noopener">Open the §5.1–5.4 theorem deck</a></p>
+    <div class="tools">
+      <button id="sound" type="button" aria-pressed="false" aria-describedby="sound-help">Sound cues: off</button>
+      <small id="sound-help">A tone drops to its lowest note as you line things up, and a chime plays when you land on an eigenvector, a root or a diagonal matrix.</small>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Stops on the path"><ol id="rail"></ol></nav>
+  <main id="stage" tabindex="-1">
+
+<!-- ============ 1 · turn ============ -->
+<section class="stop" id="turn" aria-labelledby="h-turn" hidden>
+  <p class="eyebrow">§5.1 · Eigenvectors and eigenvalues</p>
+  <h2 id="h-turn" tabindex="-1">Most vectors get knocked off their line</h2>
+  <p class="lede">Multiplying by a matrix moves a vector, and usually turns it as well. Spin <b class="cx">x</b> around and watch <b class="cax">Ax</b>. For a few special directions, Ax lands back on the line through x. Those directions are the eigenvectors.</p>
+  <div class="lab">
+    <figure class="fig">
+      <svg id="t-svg" viewBox="0 0 400 400" role="group" aria-label="The plane, with x, Ax and the line through x. Drag to point x in a new direction."><g class="dyn" aria-hidden="true"></g><g class="handle" tabindex="0" role="slider" aria-label="Direction of x" aria-valuemin="0" aria-valuemax="360"><circle class="hit" r="22"/><circle class="ring" r="12"/><circle class="knob" r="7"/></g></svg>
+      <figcaption class="readout" id="t-read" aria-live="off"></figcaption>
+    </figure>
+    <div class="controls">
+      <fieldset>
+        <legend>Matrix A</legend>
+        <label class="sr" for="t-preset">Choose a matrix</label>
+        <select id="t-preset"></select>
+        <div class="matin" role="group" aria-label="Entries of A">
+          <input id="t-a11" type="number" step="0.5" aria-label="Row 1, column 1"><input id="t-a12" type="number" step="0.5" aria-label="Row 1, column 2">
+          <input id="t-a21" type="number" step="0.5" aria-label="Row 2, column 1"><input id="t-a22" type="number" step="0.5" aria-label="Row 2, column 2">
+        </div>
+      </fieldset>
+      <div class="ctl">
+        <label for="t-angle">Direction of x <output id="t-angle-out" for="t-angle"></output></label>
+        <input id="t-angle" type="range" min="0" max="359.5" step="0.5" value="20">
+      </div>
+      <div class="row">
+        <button id="t-sweep" type="button" aria-pressed="false">Sweep a full turn</button>
+        <button id="t-jump" type="button">Jump to an eigenvector</button>
+      </div>
+      <div class="checks">
+        <label><input id="t-fan" type="checkbox"> Show where every direction goes</label>
+        <label><input id="t-eig" type="checkbox"> Show the eigenlines</label>
+      </div>
+    </div>
+  </div>
+  <div class="cols">
+    <div class="notice"><h3>Notice</h3><ul>
+      <li>The dashed blue line is the line through x. The short orange drop shows how far Ax lands off that line.</li>
+      <li>When the drop shrinks to nothing, Ax = λx. The number λ says how much A stretched x along its own line.</li>
+      <li>Turn on “where every direction goes”. Along an eigenline the grey connector points straight in or out; everywhere else it cuts sideways.</li>
+      <li>The rotation preset turns every direction, so it has no real eigenvectors. Scaling by 2 turns none of them.</li>
+    </ul></div>
+    <div class="tryit"><h3>Try it</h3>
+      <ul class="tasks"><li class="task" data-task="turn-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Find both eigen-directions of a matrix that has two. Start with §5.1 Example 2.</span><span class="sr tstate">Not done yet.</span></span></li></ul>
+      <p>Use the slider, the arrow keys on the knob, or drag. The sweep pauses on each direction that stays put if you get stuck.</p>
+      <p class="status" id="t-status"></p>
+    </div>
+  </div>
+  <div class="earns"><h3>What this builds</h3>
+    <p><b>Definition (§5.1).</b> An eigenvector of $A$ is a nonzero $\mathbf x$ with $A\mathbf x=\lambda\mathbf x$ for some scalar $\lambda$; that $\lambda$ is the eigenvalue it corresponds to.</p>
+    <p><b>Checking is easy.</b> To test a proposed eigenvector $\mathbf v$, compute $A\mathbf v$ and ask whether it is a multiple of $\mathbf v$ (§5.1 Example 2). Finding eigenvectors is the hard part; stop 3 shows how.</p>
+    <p><b>Why nonzero?</b> $A\mathbf 0=\lambda\mathbf 0$ for every $\lambda$, so allowing $\mathbf x=\mathbf 0$ would make every number an eigenvalue.</p>
+  </div>
+</section>
+
+<!-- ============ 2 · stretch ============ -->
+<section class="stop" id="stretch" aria-labelledby="h-stretch" hidden>
+  <p class="eyebrow">§5.1 · Eigenspaces</p>
+  <h2 id="h-stretch" tabindex="-1">On its own line, A can only stretch</h2>
+  <p class="lede">Once a vector sits on an eigenline, A can't turn it. All A can do there is multiply by λ. This matrix has eigenvectors <b class="ceig">v₁ = (2, 1)</b> and <b class="ceig">v₂ = (−1, 1)</b>, and you choose what it does to each line. Watch what happens to the F.</p>
+  <div class="lab">
+    <figure class="fig">
+      <svg id="s-svg" viewBox="0 0 400 400" role="group" aria-label="The two eigenlines, the letter F before A (dashed) and after A (filled)"><g class="dyn" aria-hidden="true"></g></svg>
+      <figcaption class="readout" id="s-read"></figcaption>
+    </figure>
+    <div class="controls">
+      <div class="ctl"><label for="s-l1">λ₁, the stretch along v₁ <output id="s-l1-out" for="s-l1"></output></label><input id="s-l1" type="range" min="-2" max="2.5" step="0.05" value="2"></div>
+      <div class="ctl"><label for="s-l2">λ₂, the stretch along v₂ <output id="s-l2-out" for="s-l2"></output></label><input id="s-l2" type="range" min="-2" max="2.5" step="0.05" value="0.5"></div>
+      <div class="ctl"><label for="s-t">Before → after <output id="s-t-out" for="s-t"></output></label><input id="s-t" type="range" min="0" max="1" step="0.01" value="1"></div>
+      <div class="row"><button id="s-play" type="button">Play the move</button></div>
+      <div id="s-mat" class="mrow"></div>
+    </div>
+  </div>
+  <div class="cols">
+    <div class="notice"><h3>Notice</h3><ul>
+      <li>Points on the v₁-line stay on it and slide by the factor λ₁. Same for v₂. Everything else moves as a mix of those two slides.</li>
+      <li>A negative λ reverses direction along its line, so the F flips over.</li>
+      <li>Set a λ to 0. That whole line collapses to the origin, the F flattens, and A stops being invertible.</li>
+      <li>The F's area is multiplied by |λ₁λ₂|, which is |det A|.</li>
+    </ul></div>
+    <div class="tryit"><h3>Try it</h3>
+      <ul class="tasks">
+        <li class="task" data-task="stretch-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Make A non-invertible.</span><span class="sr tstate">Not done yet.</span></span></li>
+        <li class="task" data-task="stretch-2"><span class="box" aria-hidden="true"></span><span><span class="ttext">Make A reflect the F across the v₁-line.</span><span class="sr tstate">Not done yet.</span></span></li>
+      </ul>
+      <p class="status">Sliders snap to 0, 1 and −1.</p>
+    </div>
+  </div>
+  <div class="earns"><h3>What this builds</h3>
+    <p><b>Eigenspace (§5.1).</b> The eigenvectors for $\lambda$, together with $\mathbf 0$, form $\operatorname{Nul}(A-\lambda I)$, a subspace. Here each eigenspace is a whole line.</p>
+    <p><b>Zero as an eigenvalue.</b> $\lambda=0$ means $A\mathbf x=\mathbf 0$ for some $\mathbf x\neq\mathbf 0$, so $A$ is not invertible. The Invertible Matrix Theorem gains statement (r): $0$ is not an eigenvalue of $A$ (§5.2).</p>
+    <p><b>Theorem 1.</b> The eigenvalues of a triangular matrix are its diagonal entries. For $A=\begin{bmatrix}a&b\\0&d\end{bmatrix}$, the matrix $A-aI$ has a zero first column, so it sends $\mathbf e_1$ to $\mathbf 0$.</p>
+    <p><b>Repeating A.</b> On an eigenline, applying $A$ $k$ times multiplies by $\lambda^k$. That is why $\mathbf x_k=\lambda^k\mathbf x_0$ solves $\mathbf x_{k+1}=A\mathbf x_k$ when $\mathbf x_0$ is an eigenvector.</p>
+  </div>
+</section>
+
+<!-- ============ 3 · hunt ============ -->
+<section class="stop" id="hunt" aria-labelledby="h-hunt" hidden>
+  <p class="eyebrow">§5.2 · The characteristic equation</p>
+  <h2 id="h-hunt" tabindex="-1">Hunting λ: watch A − λI flatten the plane</h2>
+  <p class="lede">Spinning vectors doesn't scale to bigger matrices, so turn the question around. λ is an eigenvalue exactly when (A − λI)x = 0 has a nonzero solution, and that happens exactly when A − λI squashes the plane flat. A determinant measures the squash.</p>
+  <div class="lab wide">
+    <figure class="fig">
+      <span class="figlabel">What A − λI does to the unit square</span>
+      <svg id="h-svg" viewBox="0 0 400 400" role="group" aria-label="The unit square and its image under A minus lambda I"><g class="dyn" aria-hidden="true"></g></svg>
+    </figure>
+    <figure class="fig">
+      <span class="figlabel">det(A − λI) as λ slides</span>
+      <svg id="h-plot" class="plot" viewBox="0 0 400 260" role="img" aria-label="Graph of det(A minus lambda I) against lambda. Click or drag to set lambda."><g class="dyn"></g></svg>
+      <figcaption class="readout" id="h-read"></figcaption>
+    </figure>
+    <div class="controls">
+      <fieldset>
+        <legend>Matrix A</legend>
+        <label class="sr" for="h-preset">Choose a matrix</label>
+        <select id="h-preset"></select>
+        <div class="matin" role="group" aria-label="Entries of A">
+          <input id="h-a11" type="number" step="0.5" aria-label="Row 1, column 1"><input id="h-a12" type="number" step="0.5" aria-label="Row 1, column 2">
+          <input id="h-a21" type="number" step="0.5" aria-label="Row 2, column 1"><input id="h-a22" type="number" step="0.5" aria-label="Row 2, column 2">
+        </div>
+      </fieldset>
+      <div class="ctl">
+        <label for="h-lam">λ <output id="h-lam-out" for="h-lam"></output></label>
+        <input id="h-lam" type="range" min="-8" max="8" step="0.01" value="0">
+        <div class="row"><button id="h-jump" type="button">Jump to the next root</button></div>
+      </div>
+      <p id="h-poly" class="mono"></p>
+    </div>
+  </div>
+  <div class="cols">
+    <div class="notice"><h3>Notice</h3><ul>
+      <li>The shaded parallelogram is the unit square after A − λI. Its area is |det(A − λI)|.</li>
+      <li>At an eigenvalue the parallelogram collapses to a segment. Two different vectors land on the same point, so some nonzero vector goes to 0. That vector spans the eigenspace.</li>
+      <li>For a 2×2 matrix, det(A − λI) = λ² − (trace A)λ + det A. A degree-2 polynomial has at most two roots, so there are at most two eigenvalues.</li>
+      <li>Shear: the graph only touches 0 (a double root). Rotation: the graph never reaches 0, so there are no real eigenvalues.</li>
+    </ul></div>
+    <div class="tryit"><h3>Try it</h3>
+      <ul class="tasks"><li class="task" data-task="hunt-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Find both eigenvalues of a matrix by sliding λ until the parallelogram flattens.</span><span class="sr tstate">Not done yet.</span></span></li></ul>
+      <p>The slider snaps to a root when you get close. You can also click the graph.</p>
+      <p class="status" id="h-status"></p>
+    </div>
+  </div>
+  <div class="earns"><h3>What this builds</h3>
+    <p><b>Characteristic equation (§5.2).</b> A scalar $\lambda$ is an eigenvalue of $A$ if and only if $\det(A-\lambda I)=0$.</p>
+    <p><b>Why a determinant?</b> $|\det(A-\lambda I)|$ is the area scale factor of $A-\lambda I$ (§3.3). Area $0$ means the plane is flattened, so $A-\lambda I$ is not invertible (Theorem 3a), so $(A-\lambda I)\mathbf x=\mathbf 0$ has a nontrivial solution.</p>
+    <p><b>Multiplicity.</b> For an $n\times n$ matrix the characteristic polynomial has degree $n$. The (algebraic) multiplicity of an eigenvalue is its multiplicity as a root. The shear's graph touches $0$ at $\lambda=1$ without crossing: a double root.</p>
+    <p><b>Warning (§5.1).</b> Once you know $\lambda$, row reducing $A-\lambda I$ finds the eigenvectors. Row reducing $A$ itself does not reveal eigenvalues.</p>
+  </div>
+</section>
+
+<!-- ============ 4 · split ============ -->
+<section class="stop" id="split" aria-labelledby="h-split" hidden>
+  <p class="eyebrow">§5.3 · Diagonalization</p>
+  <h2 id="h-split" tabindex="-1">Diagonalize: split x into eigen-parts</h2>
+  <p class="lede">With enough eigenvectors to make a basis, every x is a mix c₁v₁ + c₂v₂. Then A only rescales each part: Ax = c₁λ₁v₁ + c₂λ₂v₂, and repeating it gives Aᵏx = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂. That is all A = PDP⁻¹ says.</p>
+  <p class="pipeline" aria-label="x, multiply by P inverse to get the coordinates c1 and c2, multiply by D to get lambda1 c1 and lambda2 c2, multiply by P to get Ax"><b>x</b> <i>→ P⁻¹ →</i> <b>(c₁, c₂)</b> <i>→ D →</i> <b>(λ₁c₁, λ₂c₂)</b> <i>→ P →</i> <b>Ax</b></p>
+  <div class="lab wide">
+    <figure class="fig">
+      <span class="figlabel">Standard coordinates</span>
+      <svg id="d-svg" viewBox="0 0 400 400" role="group" aria-label="The plane with the eigenvector grid, x0 and its path under repeated multiplication by A. Drag to move x0."><g class="dyn" aria-hidden="true"></g><g class="handle" tabindex="0" role="slider" aria-label="x₀, the starting vector. Arrow keys move it." aria-valuemin="-10" aria-valuemax="10"><circle class="hit" r="22"/><circle class="ring" r="12"/><circle class="knob" r="7"/></g></svg>
+    </figure>
+    <figure class="fig">
+      <span class="figlabel">Eigen-coordinates (c₁, c₂)</span>
+      <svg id="d-svg2" viewBox="0 0 400 400" role="group" aria-label="The same points in eigen-coordinates, where A acts by stretching each axis"><g class="dyn" aria-hidden="true"></g></svg>
+    </figure>
+    <div class="controls">
+      <fieldset>
+        <legend>Start from</legend>
+        <div class="row" role="group" aria-label="Examples">
+          <button id="d-p-grow" type="button" aria-pressed="true">Growth and decay</button>
+          <button id="d-p-markov" type="button" aria-pressed="false">§5.2 Example 5</button>
+          <button id="d-p-flip" type="button" aria-pressed="false">A flip</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Eigenvalues</legend>
+        <div class="ctl"><label for="d-l1">λ₁ <output id="d-l1-out" for="d-l1"></output></label><input id="d-l1" type="range" min="-1.5" max="1.5" step="0.01" value="1.25"></div>
+        <div class="ctl"><label for="d-l2">λ₂ <output id="d-l2-out" for="d-l2"></output></label><input id="d-l2" type="range" min="-1.5" max="1.5" step="0.01" value="0.7"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Eigenvector directions</legend>
+        <div class="ctl"><label for="d-a1">v₁ <output id="d-a1-out" for="d-a1"></output></label><input id="d-a1" type="range" min="0" max="179" step="1" value="20"></div>
+        <div class="ctl"><label for="d-a2">v₂ <output id="d-a2-out" for="d-a2"></output></label><input id="d-a2" type="range" min="0" max="179" step="1" value="115"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Iterate x<sub>k+1</sub> = Ax<sub>k</sub> <output id="d-k" class="mono"></output></legend>
+        <div class="row">
+          <button id="d-step" type="button">Apply A</button>
+          <button id="d-step10" type="button">Apply A ten times</button>
+          <button id="d-reset" type="button">Back to x₀</button>
+        </div>
+      </fieldset>
+    </div>
+    <div class="readout" id="d-read" style="grid-column:1/-1"></div>
+    <p class="chip bad" id="d-warn" style="grid-column:1/-1;justify-self:start" hidden>v₁ and v₂ point along the same line, so they are not a basis. Move one of the direction sliders.</p>
+    <div class="mats" id="d-mats" style="grid-column:1/-1"></div>
+  </div>
+  <div class="cols">
+    <div class="notice"><h3>Notice</h3><ul>
+      <li>In eigen-coordinates A is just D: each axis stretches by its own λ, with no mixing. The slanted grid on the left straightens into the square grid on the right.</li>
+      <li>Apply A a few times. The part with the larger |λ| takes over, so x<sub>k</sub> swings toward that eigenline.</li>
+      <li>§5.2 Example 5 (λ = 1 and 0.92): the 0.92 part fades and x<sub>k</sub> settles at c₁v₁ = (0.375, 0.625).</li>
+      <li>Drop x₀ onto an eigenline (it snaps). It never leaves: x<sub>k</sub> = λᵏx₀.</li>
+    </ul></div>
+    <div class="tryit"><h3>Try it</h3>
+      <ul class="tasks">
+        <li class="task" data-task="split-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Put x₀ on an eigenline and apply A at least three times.</span><span class="sr tstate">Not done yet.</span></span></li>
+        <li class="task" data-task="split-2"><span class="box" aria-hidden="true"></span><span><span class="ttext">Choose eigenvalues that send every x<sub>k</sub> to 0, then apply A at least five times.</span><span class="sr tstate">Not done yet.</span></span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="earns"><h3>What this builds</h3>
+    <p><b>Theorem 5 (The Diagonalization Theorem).</b> An $n\times n$ matrix $A$ is diagonalizable if and only if it has $n$ linearly independent eigenvectors. In fact $A=PDP^{-1}$, with $D$ diagonal, exactly when the columns of $P$ are $n$ linearly independent eigenvectors and the diagonal entries of $D$ are their eigenvalues, in the same order.</p>
+    <p><b>Powers (§5.3).</b> $A^k=PD^kP^{-1}$, and $D^k$ raises each diagonal entry to the $k$th power. Read it right to left: find eigen-coordinates, scale each one by $\lambda^k$, convert back.</p>
+    <p><b>Dynamical systems (§5.2).</b> If $\mathbf x_0=c_1\mathbf v_1+c_2\mathbf v_2$, then $\mathbf x_k=c_1\lambda_1^k\mathbf v_1+c_2\lambda_2^k\mathbf v_2$.</p>
+  </div>
+</section>
+
+<!-- ============ 5 · collide ============ -->
+<section class="stop" id="collide" aria-labelledby="h-collide" hidden>
+  <p class="eyebrow">§5.3 · Theorems 2, 6 and 7</p>
+  <h2 id="h-collide" tabindex="-1">When eigenlines collide</h2>
+  <p class="lede">Diagonalizing needs n independent eigenvectors. Distinct eigenvalues guarantee them. A repeated eigenvalue might leave you one short. Slide ε to push two eigenvalues together and watch their lines.</p>
+  <div class="lab">
+    <figure class="fig">
+      <svg id="c-svg" viewBox="0 0 400 400" role="group" aria-label="The unit circle, its image under A, and the eigenlines of A"><g class="dyn" aria-hidden="true"></g></svg>
+      <figcaption class="readout" id="c-read"></figcaption>
+    </figure>
+    <div class="controls">
+      <fieldset>
+        <legend>Family</legend>
+        <div class="checks">
+          <label><input type="radio" name="c-mode" value="shear" checked> Shear: A = [2 1; 0 2+ε]</label>
+          <label><input type="radio" name="c-mode" value="scale"> Scaling: A = [2 0; 0 2+ε]</label>
+          <label><input type="radio" name="c-mode" value="rot"> Rotation by φ</label>
+        </div>
+      </fieldset>
+      <div class="ctl"><label for="c-par"><span id="c-par-name">ε</span> <output id="c-par-out" for="c-par"></output></label><input id="c-par" type="range" min="-1" max="1" step="0.01" value="0.5"></div>
+      <div class="panel" id="c-side"></div>
+    </div>
+  </div>
+  <div class="cols">
+    <div class="notice"><h3>Notice</h3><ul>
+      <li>Shear family: the eigenlines are the horizontal axis and the line through (1, ε). The angle between them shrinks as ε → 0, and det P = ε shrinks with it.</li>
+      <li>At ε = 0 the lines merge. λ = 2 has multiplicity 2 but only a one-dimensional eigenspace, so no invertible P exists.</li>
+      <li>Scaling family: at ε = 0 every direction is an eigenvector. The repeated eigenvalue does no harm here.</li>
+      <li>A repeated eigenvalue is a warning sign, not a verdict. Compare each eigenspace's dimension with the eigenvalue's multiplicity.</li>
+    </ul></div>
+    <div class="tryit"><h3>Try it</h3>
+      <ul class="tasks">
+        <li class="task" data-task="collide-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Find the shear that can't be diagonalized.</span><span class="sr tstate">Not done yet.</span></span></li>
+        <li class="task" data-task="collide-2"><span class="box" aria-hidden="true"></span><span><span class="ttext">Find a rotation that has real eigenvectors.</span><span class="sr tstate">Not done yet.</span></span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="earns"><h3>What this builds</h3>
+    <p><b>Theorem 2.</b> Eigenvectors for distinct eigenvalues are linearly independent. A line can't be stretched by two different factors at once, so distinct $\lambda$'s live on different lines.</p>
+    <p><b>Theorem 6.</b> An $n\times n$ matrix with $n$ distinct eigenvalues is diagonalizable. That condition is sufficient, not necessary: the scaling family at $\varepsilon=0$ is diagonalizable with a repeated eigenvalue.</p>
+    <p><b>Theorem 7.</b> (a) Each eigenspace has dimension at most the multiplicity of its eigenvalue. (b) $A$ is diagonalizable exactly when the eigenspace dimensions add up to $n$; equivalently, the characteristic polynomial factors completely into linear factors and each eigenspace's dimension equals its eigenvalue's multiplicity. (c) Put bases of the eigenspaces together and you get an eigenvector basis.</p>
+  </div>
+</section>
+
+<!-- ============ 6 · basis ============ -->
+<section class="stop" id="basis" aria-labelledby="h-basis" hidden>
+  <p class="eyebrow">§5.4 · Eigenvectors and linear transformations</p>
+  <h2 id="h-basis" tabindex="-1">Same map, different coordinates</h2>
+  <p class="lede">A matrix is one description of a transformation, written in some coordinates. Pick a basis B = {b₁, b₂} and describe T(x) = Ax in B-coordinates: column j of [T]<sub>B</sub> says how to build T(b<sub>j</sub>) out of b₁ and b₂. Drag the basis vectors and the description changes while the map stays put.</p>
+  <div class="lab">
+    <figure class="fig">
+      <svg id="b-svg" viewBox="0 0 400 400" role="group" aria-label="The basis vectors b1 and b2, their images under T, and how the chosen image is built from b1 and b2. Drag the knobs to change the basis."><g class="dyn" aria-hidden="true"></g>
+        <g class="handle" id="b-h1" tabindex="0" role="slider" aria-label="b₁. Arrow keys move it." aria-valuemin="-10" aria-valuemax="10"><circle class="hit" r="22"/><circle class="ring" r="12"/><circle class="knob" r="7"/></g>
+        <g class="handle" id="b-h2" tabindex="0" role="slider" aria-label="b₂. Arrow keys move it." aria-valuemin="-10" aria-valuemax="10"><circle class="hit" r="22"/><circle class="ring" r="12"/><circle class="knob" r="7"/></g></svg>
+      <figcaption class="readout"><span>Knobs snap to whole-number points and to the eigenlines.</span></figcaption>
+    </figure>
+    <div class="controls">
+      <fieldset>
+        <legend>Transformation T(x) = Ax</legend>
+        <label class="sr" for="b-preset">Choose A</label>
+        <select id="b-preset"><option value="ex4">§5.4 Example 4 · A = [7 2; −4 1]</option><option value="ex5">§5.4 Example 5 · A = [4 −9; 4 −8]</option></select>
+      </fieldset>
+      <fieldset>
+        <legend>Basis</legend>
+        <div class="row">
+          <button id="b-std" type="button">Standard e₁, e₂</button>
+          <button id="b-book" type="button">Textbook basis</button>
+          <button id="b-snap" type="button">Snap to eigenvectors</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Explain</legend>
+        <div class="checks">
+          <label><input type="radio" name="b-col" value="0" checked> Column 1: T(b₁)</label>
+          <label><input type="radio" name="b-col" value="1"> Column 2: T(b₂)</label>
+          <label><input id="b-eig" type="checkbox" checked> Show the eigenlines of A</label>
+        </div>
+      </fieldset>
+      <div class="panel" id="b-panel" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="cols">
+    <div class="notice"><h3>Notice</h3><ul>
+      <li>With the standard basis, [T]<sub>B</sub> is just A.</li>
+      <li>Every entry can change, but the trace, determinant and eigenvalues never do. Similar matrices share a characteristic polynomial.</li>
+      <li>Line both basis vectors up with eigenvectors and [T]<sub>B</sub> turns diagonal: T just stretches each basis vector.</li>
+      <li>Example 5's matrix has only one eigenline. The best you can do is triangular, with the eigenvalue −2 on the diagonal.</li>
+    </ul></div>
+    <div class="tryit"><h3>Try it</h3>
+      <ul class="tasks">
+        <li class="task" data-task="basis-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Make [T]<sub>B</sub> diagonal for Example 4.</span><span class="sr tstate">Not done yet.</span></span></li>
+        <li class="task" data-task="basis-2"><span class="box" aria-hidden="true"></span><span><span class="ttext">Make [T]<sub>B</sub> triangular for Example 5.</span><span class="sr tstate">Not done yet.</span></span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="earns"><h3>What this builds</h3>
+    <p><b>The matrix for $T$ relative to $\mathcal B$ (§5.4).</b> $[T(\mathbf x)]_{\mathcal B}=[T]_{\mathcal B}[\mathbf x]_{\mathcal B}$, where $[T]_{\mathcal B}=\begin{bmatrix}[T(\mathbf b_1)]_{\mathcal B}&\cdots&[T(\mathbf b_n)]_{\mathcal B}\end{bmatrix}$.</p>
+    <p><b>For $T(\mathbf x)=A\mathbf x$ on $\mathbb R^n$,</b> $[T]_{\mathcal B}=P^{-1}AP$ with $P=\begin{bmatrix}\mathbf b_1&\cdots&\mathbf b_n\end{bmatrix}$. Every matrix representation of $\mathbf x\mapsto A\mathbf x$ is similar to $A$, and every matrix similar to $A$ is one of its representations.</p>
+    <p><b>Theorem 8.</b> If $A=PDP^{-1}$ with $D$ diagonal and $\mathcal B$ is formed from the columns of $P$, then $D$ is the $\mathcal B$-matrix for $\mathbf x\mapsto A\mathbf x$.</p>
+    <p><b>Theorem 4.</b> Similar matrices have the same characteristic polynomial, so the same eigenvalues with the same multiplicities. That is why the trace, determinant and eigenvalues in the panel never move. The converse fails: same eigenvalues does not mean similar.</p>
+    <p><b>Beyond arrows.</b> Eigenvectors make sense for any linear $T:V\to V$. For differentiation on $\mathbb P_2$ with $\mathcal B=\{1,t,t^2\}$, $[T]_{\mathcal B}=\begin{bmatrix}0&1&0\\0&0&2\\0&0&0\end{bmatrix}$ (§5.4 Example 3). It is triangular with only $0$ on the diagonal, and its eigenvectors are the nonzero constant polynomials, since $\tfrac{d}{dt}c=0\cdot c$.</p>
+  </div>
+</section>
+
+<!-- ============ 7 · recap ============ -->
+<section class="stop" id="recap" aria-labelledby="h-recap" hidden>
+  <p class="eyebrow">Review · §5.1–5.4</p>
+  <h2 id="h-recap" tabindex="-1">The whole path, start to finish</h2>
+  <ol class="path">
+    <li><div>An eigenvector is a direction $A$ doesn't turn: $A\mathbf x=\lambda\mathbf x$ with $\mathbf x\neq\mathbf 0$. <a href="#turn" data-go="turn">Stop 1</a></div></li>
+    <li><div>The eigenvalue is the stretch along that line. $\lambda=0$ crushes the line to $\mathbf 0$, so $A$ isn't invertible. <a href="#stretch" data-go="stretch">Stop 2</a></div></li>
+    <li><div>Find $\lambda$ first: $\det(A-\lambda I)=0$ is the moment $A-\lambda I$ flattens space. Then solve $(A-\lambda I)\mathbf x=\mathbf 0$ for the eigenspace. <a href="#hunt" data-go="hunt">Stop 3</a></div></li>
+    <li><div>With $n$ independent eigenvectors, $A=PDP^{-1}$: switch to eigen-coordinates, stretch each axis, switch back. Powers come free: $A^k=PD^kP^{-1}$. <a href="#split" data-go="split">Stop 4</a></div></li>
+    <li><div>Distinct eigenvalues guarantee independent eigenvectors. A repeated eigenvalue might not supply enough, so compare each eigenspace's dimension with its multiplicity. <a href="#collide" data-go="collide">Stop 5</a></div></li>
+    <li><div>A matrix is one description of a map. Changing basis gives $P^{-1}AP$, a similar matrix with the same eigenvalues, and an eigenvector basis makes it diagonal. <a href="#basis" data-go="basis">Stop 6</a></div></li>
+  </ol>
+  <div class="quizhead"><h3>Check yourself: true or false?</h3><span class="status" id="q-score"></span></div>
+  <ul class="tasks"><li class="task" data-task="recap-1"><span class="box" aria-hidden="true"></span><span><span class="ttext">Answer all nine statements.</span><span class="sr tstate">Not done yet.</span></span></li></ul>
+  <ol id="quiz"></ol>
+  <div class="row"><button id="q-reset" type="button">Clear my answers</button><button id="all-reset" type="button">Reset every challenge</button></div>
+</section>
+
+    <nav class="pager" aria-label="Previous and next stop">
+      <button id="prev" type="button">← Previous</button>
+      <span class="where" id="where"></span>
+      <button id="next" type="button">Next →</button>
+    </nav>
+  </main>
+</div>
+<div id="announce" class="sr" aria-live="polite"></div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'},startup:{typeset:false}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<script>
+// ---------- small helpers
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)');
+function fmt(n,d=2){
+  if(!Number.isFinite(n))return '—';
+  if(Math.abs(n)<0.5*10**-d)n=0;
+  let s=n.toFixed(d);
+  if(s.includes('.'))s=s.replace(/0+$/,'').replace(/\.$/,'');
+  if(s==='-0')s='0';
+  return s.replace('-','−');
+}
+const vec=(v,d=2)=>`(${fmt(v[0],d)}, ${fmt(v[1],d)})`;
+const f1=n=>(Number.isFinite(n)?Math.max(-1e5,Math.min(1e5,n)):0).toFixed(1);
+const sub=n=>String(n).replace(/\d/g,c=>'₀₁₂₃₄₅₆₇₈₉'[c]);
+const sup=n=>String(n).replace(/\d/g,c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[c]);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+// ---------- 2×2 linear algebra
+const det=A=>A[0][0]*A[1][1]-A[0][1]*A[1][0];
+const tr=A=>A[0][0]+A[1][1];
+const mv=(A,v)=>[A[0][0]*v[0]+A[0][1]*v[1],A[1][0]*v[0]+A[1][1]*v[1]];
+const mm=(A,B)=>[[A[0][0]*B[0][0]+A[0][1]*B[1][0],A[0][0]*B[0][1]+A[0][1]*B[1][1]],[A[1][0]*B[0][0]+A[1][1]*B[1][0],A[1][0]*B[0][1]+A[1][1]*B[1][1]]];
+const inv=A=>{const d=det(A);return[[A[1][1]/d,-A[0][1]/d],[-A[1][0]/d,A[0][0]/d]]};
+const colsOf=(u,v)=>[[u[0],v[0]],[u[1],v[1]]];
+const len=v=>Math.hypot(v[0],v[1]);
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+const sc=(v,k)=>[v[0]*k,v[1]*k];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+const unit=deg=>[Math.cos(deg*Math.PI/180),Math.sin(deg*Math.PI/180)];
+const angOf=v=>((Math.atan2(v[1],v[0])*180/Math.PI)%360+360)%360;
+const angDist=(a,b)=>{const d=Math.abs(((a-b)%360+360)%360);return Math.min(d,360-d)};
+const lineDiff=(a,b)=>{const d=Math.abs(((a-b)%180+180)%180);return Math.min(d,180-d)};
+function sigmaMax(A){const p=A[0][0]**2+A[0][1]**2+A[1][0]**2+A[1][1]**2,q=det(A);return Math.sqrt((p+Math.sqrt(Math.max(0,p*p-4*q*q)))/2)}
+const canon=v=>(v[1]<-1e-12||(Math.abs(v[1])<=1e-12&&v[0]<0))?[-v[0],-v[1]]:v;
+function nullDir(B){const[a,b]=B[0],[c,e]=B[1];const v=Math.hypot(a,b)>=Math.hypot(c,e)?[-b,a]:[-e,c];const n=len(v)||1;return canon([v[0]/n,v[1]/n])}
+// Real eigen-data of a 2×2: roots with multiplicity, and for each root its eigenline (or the whole plane)
+function eig(A){
+  const t=tr(A),d=det(A),disc=t*t-4*d,scale=1+Math.abs(t)+Math.abs(d);
+  if(disc<-1e-9*scale*scale)return{complex:true,re:t/2,im:Math.sqrt(-disc)/2,roots:[],lines:[]};
+  const s=Math.sqrt(Math.max(0,disc)),rep=s<1e-7*scale;
+  const roots=rep?[{v:t/2,m:2}]:[{v:(t+s)/2,m:1},{v:(t-s)/2,m:1}];
+  const lines=roots.map(r=>{
+    const B=[[A[0][0]-r.v,A[0][1]],[A[1][0],A[1][1]-r.v]];
+    if(Math.max(...B.flat().map(Math.abs))<1e-7*scale)return{lambda:r.v,all:true,mult:r.m};
+    return{lambda:r.v,dir:nullDir(B),mult:r.m};
+  });
+  return{complex:false,roots,lines};
+}
+function niceCeil(m){for(const c of[1,1.5,2,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100])if(c>=m)return c;return Math.ceil(m/50)*50}
+const gstep=R=>R<=1.2?.25:R<=2.5?.5:R<=5?1:R<=12?2:5;
+function niceTicks(a,b,n){const raw=(b-a)/n,p=10**Math.floor(Math.log10(raw)),st=[1,2,2.5,5,10].map(m=>m*p).find(x=>x>=raw);const out=[];for(let k=Math.ceil(a/st);k*st<=b+1e-9;k++)out.push(k*st);return out}
+function matHTML(A,cls=''){return`<span class="mat ${cls}" role="img" aria-label="matrix with rows ${fmt(A[0][0])}, ${fmt(A[0][1])} and ${fmt(A[1][0])}, ${fmt(A[1][1])}">${A.flat().map(v=>`<span>${fmt(v)}</span>`).join('')}</span>`}
+const matText=A=>`[${fmt(A[0][0])} ${fmt(A[0][1])}; ${fmt(A[1][0])} ${fmt(A[1][1])}]`;
+function polyText(A){const t=tr(A),d=det(A),ta=fmt(Math.abs(t)),da=fmt(Math.abs(d));let s='λ²';if(ta!=='0')s+=` ${t>0?'−':'+'} ${ta==='1'?'':ta}λ`;if(da!=='0')s+=` ${d>0?'+':'−'} ${da}`;return s}
+function factorText(E){
+  const term=r=>{const a=fmt(Math.abs(r));return a==='0'?'λ':`(λ ${r>0?'−':'+'} ${a})`};
+  if(E.roots.length===1)return term(E.roots[0].v)+'²';
+  return E.roots.map(r=>term(r.v)).sort((a,b)=>(a==='λ'?-1:0)-(b==='λ'?-1:0)).join('');
+}
+function eigList(E){if(E.complex){const re=fmt(E.re),im=fmt(E.im)==='1'?'':fmt(E.im);return re==='0'?`±${im}i`:`${re} ± ${im}i`}if(E.roots.length===1)return`${fmt(E.roots[0].v)} (twice)`;return E.roots.map(r=>fmt(r.v)).join(' and ')}
+
+// ---------- drawing on a 400×400 plane
+class Plane{
+  constructor(svg,Rx,Ry){this.svg=svg;this.set(Rx,Ry)}
+  set(Rx,Ry=Rx){this.Rx=Rx;this.Ry=Ry;return this}
+  X(x){return(x/this.Rx+1)*200}
+  Y(y){return(1-y/this.Ry)*200}
+  P(v){return[this.X(v[0]),this.Y(v[1])]}
+  world(e){const m=this.svg.getScreenCTM();if(!m)return null;const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse());return[(p.x/200-1)*this.Rx,(1-p.y/200)*this.Ry]}
+  grid(sx,sy=sx){
+    let g='',a='';
+    for(let k=Math.ceil(-this.Rx/sx-1e-9);k*sx<=this.Rx+1e-9;k++){const x=f1(this.X(k*sx)),l=`<line class="${k?'gl':'axis'}" x1="${x}" y1="0" x2="${x}" y2="400"/>`;k?g+=l:a+=l}
+    for(let k=Math.ceil(-this.Ry/sy-1e-9);k*sy<=this.Ry+1e-9;k++){const y=f1(this.Y(k*sy)),l=`<line class="${k?'gl':'axis'}" x1="0" y1="${y}" x2="400" y2="${y}"/>`;k?g+=l:a+=l}
+    return g+a;
+  }
+  seg(a,b,cls){const p=this.P(a),q=this.P(b);return`<line class="${cls}" x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(q[0])}" y2="${f1(q[1])}"/>`}
+  line(d,cls,through=[0,0]){const k=6*Math.max(this.Rx,this.Ry)/(len(d)||1);return this.seg([through[0]-d[0]*k,through[1]-d[1]*k],[through[0]+d[0]*k,through[1]+d[1]*k],cls)}
+  text(pt,str,cls){const hw=3.7*String(str).length+4,x=Math.min(396-hw,Math.max(hw,pt[0])),y=Math.min(390,Math.max(12,pt[1]));return`<text class="lbl ${cls}" x="${f1(x)}" y="${f1(y)}" text-anchor="middle" dominant-baseline="middle">${esc(str)}</text>`}
+  band(d,label,frac=0.8){
+    let s=this.line(d,'band')+this.line(d,'bandcore');
+    if(!label)return s;
+    let dx=d[0]/this.Rx,dy=-d[1]/this.Ry;const n=Math.hypot(dx,dy)||1;dx/=n;dy/=n;
+    if(dy>1e-9||(Math.abs(dy)<=1e-9&&dx<0)){dx=-dx;dy=-dy}
+    const t=Math.min(Math.abs(dx)>1e-9?172/Math.abs(dx):1e9,Math.abs(dy)>1e-9?172/Math.abs(dy):1e9)*frac;
+    return s+this.text([200+dx*t-dy*15,200+dy*t+dx*15],label,'eig');
+  }
+  arrow(a,b,cls,label,lcls,where='tip'){
+    const p=this.P(a),q=this.P(b),dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy);
+    let s=`<g class="arr ${cls}">`;
+    if(L<3)s+=`<circle cx="${f1(q[0])}" cy="${f1(q[1])}" r="4.5"/>`;
+    else{
+      const ux=dx/L,uy=dy/L,h=Math.min(12,L*0.45),w=h*0.48,bx=q[0]-ux*h,by=q[1]-uy*h;
+      s+=`<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(bx+ux)}" y2="${f1(by+uy)}"/><polygon points="${f1(q[0])},${f1(q[1])} ${f1(bx-uy*w)},${f1(by+ux*w)} ${f1(bx+uy*w)},${f1(by-ux*w)}"/>`;
+    }
+    s+='</g>';
+    if(label){
+      const ux=L<3?0.7:dx/L,uy=L<3?-0.7:dy/L;
+      s+=where==='mid'?this.text([(p[0]+q[0])/2-uy*14,(p[1]+q[1])/2+ux*14],label,lcls):this.text([q[0]+ux*15,q[1]+uy*15],label,lcls);
+    }
+    return s;
+  }
+  poly(pts,cls){return`<polygon class="${cls}" points="${pts.map(v=>this.P(v).map(f1).join(',')).join(' ')}"/>`}
+  polyline(pts,cls){return`<polyline class="${cls}" points="${pts.map(v=>this.P(v).map(f1).join(',')).join(' ')}"/>`}
+  dot(v,cls,r=4){const p=this.P(v);return`<circle class="${cls}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${r}"/>`}
+  circle(r,cls){return`<ellipse class="${cls}" cx="200" cy="200" rx="${f1(r/this.Rx*200)}" ry="${f1(r/this.Ry*200)}"/>`}
+  curve(fn,cls){const pts=[];for(let i=0;i<=96;i++)pts.push(fn(i/96*2*Math.PI));return this.polyline(pts,cls)}
+  wash(label){return'<rect class="wash" x="0" y="0" width="400" height="400"/>'+(label?this.text([200,20],label,'eig'):'')}
+  handleAt(h,v){const p=this.P(v);h.setAttribute('transform',`translate(${f1(p[0])} ${f1(p[1])})`)}
+}
+function dragOn(el,cb){
+  el.addEventListener('pointerdown',e=>{
+    if(e.button>0)return;
+    const id=e.pointerId;try{el.setPointerCapture(id)}catch(_){}
+    cb(e,true);
+    const move=ev=>{if(ev.pointerId===id)cb(ev,false)};
+    const end=ev=>{if(ev.pointerId!==id)return;el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',end);el.removeEventListener('pointercancel',end)};
+    el.addEventListener('pointermove',move);el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+  });
+}
+const ARROWS={ArrowRight:[1,0],ArrowLeft:[-1,0],ArrowUp:[0,1],ArrowDown:[0,-1]};
+
+// ---------- announcements and sound
+const annEl=$('#announce');let annT=0;
+function say(msg){clearTimeout(annT);annT=setTimeout(()=>{annEl.textContent='';requestAnimationFrame(()=>{annEl.textContent=msg})},150)}
+// Optional audio: a tone that falls to its lowest pitch as things line up, and a chime on success
+const Sound={on:false,ctx:null,osc:null,g:null,t:0,
+  toggle(){
+    this.on=!this.on;
+    if(this.on){try{
+      if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;this.ctx=new C();this.osc=this.ctx.createOscillator();this.g=this.ctx.createGain();this.osc.type='triangle';this.g.gain.value=0;this.osc.connect(this.g).connect(this.ctx.destination);this.osc.start()}
+      if(this.ctx.resume)this.ctx.resume();
+    }catch(e){this.on=false}}
+    else if(this.g)this.g.gain.setTargetAtTime(0,this.ctx.currentTime,0.05);
+    return this.on;
+  },
+  hum(x){
+    if(!this.on||!this.ctx)return;
+    const now=this.ctx.currentTime;
+    this.osc.frequency.setTargetAtTime(220*Math.pow(2,Math.min(1,Math.max(0,x))*1.5),now,0.03);
+    this.g.gain.setTargetAtTime(0.045,now,0.03);
+    clearTimeout(this.t);this.t=setTimeout(()=>this.g.gain.setTargetAtTime(0,this.ctx.currentTime,0.12),420);
+  },
+  chime(big){
+    if(!this.on||!this.ctx)return;
+    const now=this.ctx.currentTime;
+    (big?[523.25,659.25,783.99]:[659.25,987.77]).forEach((f,i)=>{
+      const o=this.ctx.createOscillator(),g=this.ctx.createGain(),t0=now+i*0.09;
+      o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(0.09,t0+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.5);
+      o.connect(g).connect(this.ctx.destination);o.start(t0);o.stop(t0+0.55);
+    });
+  }
+};
+$('#sound').onclick=e=>{const on=Sound.toggle();e.currentTarget.setAttribute('aria-pressed',String(on));e.currentTarget.textContent=`Sound cues: ${on?'on':'off'}`};
+
+// ---------- progress (per-viewer convenience; the page works without it)
+const STORE='eigen-path-v1';
+let saved={stop:null,tasks:{},quiz:{}};
+try{const v=JSON.parse(localStorage.getItem(STORE));if(v&&typeof v==='object')saved={stop:v.stop||null,tasks:v.tasks||{},quiz:v.quiz||{}}}catch(e){}
+const persist=()=>{try{localStorage.setItem(STORE,JSON.stringify(saved))}catch(e){}};
+const STOPS=[
+  {id:'turn',sec:'§5.1',short:'Most vectors turn'},
+  {id:'stretch',sec:'§5.1',short:'On its line, A stretches'},
+  {id:'hunt',sec:'§5.2',short:'Hunting λ'},
+  {id:'split',sec:'§5.3',short:'Split into eigen-parts'},
+  {id:'collide',sec:'§5.3',short:'When eigenlines collide'},
+  {id:'basis',sec:'§5.4',short:'Same map, new coordinates'},
+  {id:'recap',sec:'Review',short:'The whole path'},
+];
+function paintTask(li,done){li.classList.toggle('done',done);$('.tstate',li).textContent=done?'Done.':'Not done yet.'}
+function completeTask(id){
+  if(saved.tasks[id])return;
+  saved.tasks[id]=true;persist();
+  const li=$(`[data-task="${id}"]`);
+  if(li){paintTask(li,true);say('Challenge done: '+$('.ttext',li).textContent)}
+  Sound.chime(true);paintRail();
+}
+const stopDone=id=>{const lis=$$(`#${id} [data-task]`);return lis.length>0&&lis.every(li=>saved.tasks[li.dataset.task])};
+const rail=$('#rail');
+rail.innerHTML=STOPS.map((s,i)=>`<li><a href="#${s.id}" data-go="${s.id}"><span class="n">${i+1}</span><span class="t"><span class="sec">${s.sec}</span><span>${s.short}</span></span><span class="sr st"></span></a></li>`).join('');
+let current='turn';
+function paintRail(){
+  $$('a',rail).forEach(a=>{
+    const id=a.dataset.go,done=stopDone(id);
+    a.classList.toggle('done',done);
+    if(id===current)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current');
+    $('.st',a).textContent=done?' (challenges done)':'';
+  });
+}
+const prevBtn=$('#prev'),nextBtn=$('#next');
+function go(id,focus=true){
+  if(!STOPS.some(s=>s.id===id))id='turn';
+  current=id;
+  STOPS.forEach(s=>{$('#'+s.id).hidden=s.id!==id});
+  const i=STOPS.findIndex(s=>s.id===id);
+  prevBtn.disabled=i===0;nextBtn.disabled=i===STOPS.length-1;
+  prevBtn.textContent=i>0?`← ${STOPS[i-1].short}`:'← Previous';
+  nextBtn.textContent=i<STOPS.length-1?`Next: ${STOPS[i+1].short} →`:'Next →';
+  $('#where').textContent=`Stop ${i+1} of ${STOPS.length}`;
+  paintRail();
+  saved.stop=id;persist();
+  try{history.replaceState(null,'','#'+id)}catch(e){}
+  if(focus){$('#h-'+id).focus({preventScroll:true});$('#stage').scrollIntoView({block:'start',behavior:RM.matches?'auto':'smooth'})}
+}
+prevBtn.onclick=()=>{const i=STOPS.findIndex(s=>s.id===current);if(i>0)go(STOPS[i-1].id)};
+nextBtn.onclick=()=>{const i=STOPS.findIndex(s=>s.id===current);if(i<STOPS.length-1)go(STOPS[i+1].id)};
+document.addEventListener('click',e=>{const a=e.target.closest('a[data-go]');if(a){e.preventDefault();go(a.dataset.go)}});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h&&h!==current&&STOPS.some(s=>s.id===h))go(h)});
+
+// ---------- matrix presets and the picker shared by stops 1 and 3
+const PRESETS={
+  ex2:{label:'§5.1 Example 2',A:[[1,6],[5,2]]},
+  ex1:{label:'§5.1 Example 1',A:[[3,-2],[1,0]]},
+  d53:{label:'§5.3 Example 2',A:[[7,2],[-4,1]]},
+  shear:{label:'Shear',A:[[1,1],[0,1]]},
+  rot:{label:'Rotation by 90°',A:[[0,-1],[1,0]]},
+  scale:{label:'Scaling by 2',A:[[2,0],[0,2]]},
+};
+function matrixPicker(prefix,initial,onChange){
+  const sel=$(`#${prefix}-preset`),ins=['11','12','21','22'].map(k=>$(`#${prefix}-a${k}`));
+  sel.innerHTML=Object.entries(PRESETS).map(([k,p])=>`<option value="${k}">${p.label} · ${matText(p.A)}</option>`).join('')+'<option value="custom">Your own (type the entries)</option>';
+  let A;
+  const match=()=>Object.keys(PRESETS).find(k=>PRESETS[k].A.flat().every((v,i)=>v===A[i>>1][i&1]))||'custom';
+  function setA(M){A=M.map(r=>r.slice());ins.forEach((el,i)=>{el.value=A[i>>1][i&1]});onChange(A)}
+  sel.onchange=()=>{if(sel.value!=='custom')setA(PRESETS[sel.value].A)};
+  ins.forEach((el,i)=>el.addEventListener('input',()=>{const v=parseFloat(el.value);if(!Number.isFinite(v)||Math.abs(v)>99)return;A[i>>1][i&1]=v;sel.value=match();onChange(A.map(r=>r.slice()))}));
+  sel.value=initial;setA(PRESETS[initial].A);
+}
+
+// ================= Stop 1: spin x and watch Ax
+(function(){
+  const svg=$('#t-svg'),pl=new Plane(svg,4),dyn=$('.dyn',svg),h=$('.handle',svg);
+  const ang=$('#t-angle'),out=$('#t-angle-out'),read=$('#t-read'),status=$('#t-status'),fan=$('#t-fan'),showE=$('#t-eig'),sweepBtn=$('#t-sweep');
+  let A=[[1,6],[5,2]],E=eig(A),theta=20,r=1,found=new Set(),sweepId=0,wasAligned=false;
+  const eigAngles=()=>E.complex?[]:E.lines.filter(L=>!L.all).flatMap(L=>{const a=angOf(L.dir);return[a,(a+180)%360]});
+  function misalign(u){const Au=mv(A,u),n=len(Au);if(n<1e-9)return 0;return Math.acos(Math.min(1,Math.abs(dot(u,Au))/n))*180/Math.PI}
+  // Snaps onto an eigen-direction when close, but never re-captures the one being moved away from
+  function setTheta(t,snap=true){
+    const prev=theta;theta=((t%360)+360)%360;
+    if(snap)for(const a of eigAngles())if(angDist(theta,a)<1.2&&angDist(prev,a)>1e-6)theta=a;
+    ang.value=String(Math.round(theta*2)/2);update();
+  }
+  function paintStatus(){
+    if(E.complex){status.textContent='This matrix turns every direction, so it has no real eigenvectors. Its eigenvalues are complex (§5.5).';return}
+    if(E.lines.some(L=>L.all)){status.textContent=`Every direction stays put: every nonzero vector is an eigenvector with λ = ${fmt(E.lines[0].lambda)}.`;return}
+    const n=E.lines.length,list=[...found].sort().map(i=>`λ = ${fmt(E.lines[i].lambda)}`).join(' and ');
+    status.innerHTML=`<b>${found.size} of ${n}</b> eigen-direction${n>1?'s':''} found${found.size?`: ${list}`:''}.`+(n===1?' This matrix has only one.':'');
+  }
+  function update(){
+    const u=unit(theta),x=sc(u,r),Au=mv(A,u),Ax=sc(Au,r),m=misalign(u),zero=len(Au)<1e-9,aligned=m<0.05;
+    let hit=-1;
+    if(!E.complex)E.lines.forEach((L,i)=>{if(!L.all&&lineDiff(theta,angOf(L.dir))<0.05)hit=i});
+    const fresh=hit>=0&&!found.has(hit);if(fresh)found.add(hit);
+    let s=pl.grid(1);
+    if(fan.checked){
+      s+=pl.circle(r,'ring-x')+pl.curve(t=>sc(mv(A,[Math.cos(t),Math.sin(t)]),r),'ring-ax');
+      for(let k=0;k<24;k++){const w=sc(unit(k*15),r);s+=pl.seg(w,mv(A,w),'conn')}
+    }
+    if(showE.checked&&!E.complex)E.lines.forEach((L,i)=>{s+=L.all?pl.wash(`every direction: λ = ${fmt(L.lambda)}`):pl.band(L.dir,`λ = ${fmt(L.lambda)}`,i?0.6:0.86)});
+    s+=pl.line(u,'xline');
+    if(!aligned){const foot=sc(u,dot(Ax,u));s+=pl.seg(Ax,foot,'drop')+pl.dot(foot,'footdot',2.5)}
+    s+=pl.arrow([0,0],Ax,'vax','Ax','ax')+pl.arrow([0,0],x,'vx','x','x');
+    dyn.innerHTML=s;pl.handleAt(h,x);
+    const lam=dot(Au,u);
+    const verdict=zero?'Ax = 0 = 0·x, so x is an eigenvector with eigenvalue 0.'
+      :aligned?`Ax = ${fmt(lam)}x lies on the line through x, so x is an eigenvector with eigenvalue λ = ${fmt(lam)}.`
+      :`Ax points ${fmt(m,1)}° away from the line through x, so x is not an eigenvector.`;
+    read.innerHTML=`<span class="pair"><span class="cx">x = ${vec(u)}</span><span class="cax">Ax = ${vec(Au)}</span></span><span class="verdict${aligned?' yes':''}">${verdict}</span>`;
+    out.textContent=`${fmt(theta,1)}°`;
+    const vt=`${fmt(theta,1)} degrees. `+(aligned?`Eigenvector, eigenvalue ${fmt(lam)}.`:`Ax is ${fmt(m,0)} degrees off the line.`);
+    ang.setAttribute('aria-valuetext',vt);h.setAttribute('aria-valuenow',String(Math.round(theta)));h.setAttribute('aria-valuetext',vt);
+    paintStatus();
+    Sound.hum(m/90);if(aligned&&!wasAligned)Sound.chime();wasAligned=aligned;
+    if(fresh){
+      say(`Found an eigen-direction with eigenvalue ${fmt(E.lines[hit].lambda)}.`);
+      if(E.lines.length===2&&found.size===2)completeTask('turn-1');
+    }
+  }
+  function stopSweep(){if(sweepId){cancelAnimationFrame(sweepId);sweepId=0}sweepBtn.textContent='Sweep a full turn';sweepBtn.setAttribute('aria-pressed','false')}
+  // Turns x once around, holding briefly on every eigen-direction it crosses
+  function sweep(){
+    if(sweepId){stopSweep();return}
+    sweepBtn.textContent='Stop the sweep';sweepBtn.setAttribute('aria-pressed','true');
+    const targets=eigAngles();let moved=0,last=performance.now(),hold=0,acc=0;
+    const tick=now=>{
+      const dt=Math.min(80,now-last);last=now;
+      if(hold>0)hold-=dt;
+      else{
+        let inc;
+        if(RM.matches){acc+=dt;inc=acc>=450?15:0;if(inc)acc=0}else inc=dt*0.06;
+        if(inc>0){
+          let hit=null,hd=Infinity;
+          for(const a of targets){const d=((a-theta)%360+360)%360;if(d>1e-6&&d<=inc&&d<hd){hit=a;hd=d}}
+          if(hit!==null){moved+=hd;theta=hit;hold=1100}else{moved+=inc;theta=(theta+inc)%360}
+          setTheta(theta,false);
+          if(moved>=360-1e-6){stopSweep();return}
+        }
+      }
+      sweepId=requestAnimationFrame(tick);
+    };
+    sweepId=requestAnimationFrame(tick);
+  }
+  function setMatrix(M){A=M;E=eig(A);r=Math.min(3,3.4/Math.max(sigmaMax(A),1e-6));found=new Set();wasAligned=false;stopSweep();setTheta(theta,false)}
+  matrixPicker('t','ex2',setMatrix);
+  ang.addEventListener('input',()=>{stopSweep();setTheta(+ang.value)});
+  dragOn(svg,e=>{const p=pl.world(e);if(p&&len(p)>1e-6){stopSweep();setTheta(angOf(p))}});
+  h.addEventListener('keydown',e=>{
+    const step=e.shiftKey?5:1,d={ArrowRight:step,ArrowUp:step,ArrowLeft:-step,ArrowDown:-step,PageUp:15,PageDown:-15}[e.key];
+    if(d===undefined)return;e.preventDefault();stopSweep();setTheta(theta+d);
+  });
+  fan.onchange=update;showE.onchange=update;sweepBtn.onclick=sweep;
+  $('#t-jump').onclick=()=>{
+    stopSweep();const ts=eigAngles();
+    if(!ts.length){say(E.complex?'There is no real eigenvector to jump to: this matrix turns every direction.':'Every direction is already an eigenvector.');return}
+    let best=ts[0],bd=Infinity;for(const a of ts){const d=((a-theta)%360+360)%360;if(d>0.01&&d<bd){bd=d;best=a}}
+    setTheta(best,false);
+  };
+})();
+
+// ================= Stop 2: choose the stretch on each eigenline
+(function(){
+  const svg=$('#s-svg'),pl=new Plane(svg,4),dyn=$('.dyn',svg),l1=$('#s-l1'),l2=$('#s-l2'),tS=$('#s-t'),read=$('#s-read'),mat=$('#s-mat'),play=$('#s-play');
+  const V1=[2,1],V2=[-1,1],P=colsOf(V1,V2),Pi=inv(P);
+  const F=[[0.3,0.3],[0.65,0.3],[0.65,0.9],[1.1,0.9],[1.1,1.2],[0.65,1.2],[0.65,1.55],[1.3,1.55],[1.3,1.85],[0.3,1.85]];
+  let lam1=2,lam2=0.5,playId=0;
+  const snap=v=>{for(const c of[0,1,-1])if(Math.abs(v-c)<0.04)return c;return v};
+  // (1−t)I + tA keeps the same eigenvectors, so the in-between frames never leave the eigenlines
+  const Mof=t=>mm(mm(P,[[1-t+t*lam1,0],[0,1-t+t*lam2]]),Pi);
+  function describe(l){
+    if(l===0)return'crushes its line to the origin';
+    if(l===1)return'leaves its line alone';
+    if(l===-1)return'flips its line end over end';
+    if(l>1)return`stretches its line by ${fmt(l)}`;
+    if(l>0)return`shrinks its line to ${fmt(l)} of its length`;
+    if(l>-1)return`flips its line and shrinks it to ${fmt(-l)} of its length`;
+    return`flips its line and stretches it by ${fmt(-l)}`;
+  }
+  function update(){
+    lam1=snap(+l1.value);lam2=snap(+l2.value);
+    const t=+tS.value,A=Mof(1),M=Mof(t);
+    $('#s-l1-out').textContent=fmt(lam1);$('#s-l2-out').textContent=fmt(lam2);
+    $('#s-t-out').textContent=t===0?'before':t===1?'after A':`${Math.round(t*100)}%`;
+    l1.setAttribute('aria-valuetext',`λ₁ = ${fmt(lam1)}, ${describe(lam1)}`);l2.setAttribute('aria-valuetext',`λ₂ = ${fmt(lam2)}, ${describe(lam2)}`);
+    let s=pl.grid(1)+pl.band(V1,'v₁-line',0.88)+pl.band(V2,'v₂-line',0.88);
+    s+=pl.poly(F,'shape-x')+pl.poly(F.map(p=>mv(M,p)),'shape-ax');
+    const a1=sc(V1,0.75),a2=sc(V2,1.1);
+    s+=pl.arrow([0,0],mv(M,a1),'vax',t===1?'Av₁':'','ax')+pl.arrow([0,0],mv(M,a2),'vax',t===1?'Av₂':'','ax');
+    s+=pl.arrow([0,0],a1,'vx thin','v₁','x','mid')+pl.arrow([0,0],a2,'vx thin','v₂','x','mid');
+    dyn.innerHTML=s;
+    mat.innerHTML=`<span class="eq">A =</span>${matHTML(A)}`;
+    const dA=lam1*lam2;
+    read.innerHTML=`<span><b class="ceig">Along v₁:</b> λ₁ = ${fmt(lam1)} ${describe(lam1)}.</span><span><b class="ceig">Along v₂:</b> λ₂ = ${fmt(lam2)} ${describe(lam2)}.</span><span>det A = λ₁λ₂ = ${fmt(dA,3)} &nbsp;${dA===0?'<span class="chip bad">A is not invertible</span>':'<span class="chip ok">A is invertible</span>'}</span>`;
+    if(lam1===0||lam2===0)completeTask('stretch-1');
+    if(lam1===1&&lam2===-1)completeTask('stretch-2');
+  }
+  function animate(){
+    cancelAnimationFrame(playId);
+    if(RM.matches){tS.value='1';update();return}
+    const t0=performance.now();
+    const tick=now=>{const p=Math.min(1,(now-t0)/1600),e=p<.5?2*p*p:1-2*(1-p)*(1-p);tS.value=String(e);update();if(p<1)playId=requestAnimationFrame(tick)};
+    tS.value='0';update();playId=requestAnimationFrame(tick);
+  }
+  [l1,l2,tS].forEach(el=>el.addEventListener('input',()=>{cancelAnimationFrame(playId);update()}));
+  play.onclick=animate;
+  update();
+})();
+
+// ================= Stop 3: slide λ until A − λI flattens
+(function(){
+  const svg=$('#h-svg'),pl=new Plane(svg,8),dyn=$('.dyn',svg),plot=$('#h-plot'),pdyn=$('.dyn',plot);
+  const S=$('#h-lam'),out=$('#h-lam-out'),read=$('#h-read'),status=$('#h-status'),polyEl=$('#h-poly');
+  const W=400,H=260,ml=46,mr=14,mt=14,mb=30;
+  let A,E,lo=-8,hi=8,lam=0,found=new Set(),wasZero=false,pmax=1;
+  const p=L=>(A[0][0]-L)*(A[1][1]-L)-A[0][1]*A[1][0];
+  function setMatrix(M){
+    A=M;E=eig(A);
+    const t=tr(A),disc=t*t-4*det(A),w=Math.max(2,0.8*Math.sqrt(Math.abs(disc))+1.2);
+    lo=t/2-w;hi=t/2+w;S.min=String(lo);S.max=String(hi);
+    let m=0;for(const L of[lo,hi]){const c1=[A[0][0]-L,A[1][0]],c2=[A[0][1],A[1][1]-L];m=Math.max(m,len(c1),len(c2),len(add(c1,c2)))}
+    pl.set(niceCeil(m*1.08));
+    pmax=Math.max(Math.abs(p(lo)),Math.abs(p(hi)),Math.abs(p(t/2)))||1;
+    found=new Set();wasZero=false;
+    polyEl.textContent=`det(A − λI) = ${polyText(A)}`+(E.complex?', which is never 0 for real λ':` = ${factorText(E)}`);
+    plot.setAttribute('aria-label',`Graph of det(A − λI) = ${polyText(A)} for λ from ${fmt(lo,1)} to ${fmt(hi,1)}. Click or drag to set λ.`);
+    lam=NaN;setLam(lo+0.2*(hi-lo),false);
+  }
+  function setLam(v,snap=true){
+    const prev=lam;lam=Math.min(hi,Math.max(lo,v));
+    if(snap&&!E.complex)for(const r of E.roots)if(Math.abs(lam-r.v)<(hi-lo)/70&&!(Math.abs(prev-r.v)<1e-9))lam=r.v;
+    S.value=String(lam);update();
+  }
+  function drawPlot(){
+    const xs=[],ys=[];for(let i=0;i<=200;i++){const L=lo+(hi-lo)*i/200;xs.push(L);ys.push(p(L))}
+    let y0=Math.min(0,...ys),y1=Math.max(0,...ys);const pad=(y1-y0)*0.08||1;y0-=pad;y1+=pad;
+    const X=L=>ml+(L-lo)/(hi-lo)*(W-ml-mr),Y=v=>mt+(y1-v)/(y1-y0)*(H-mt-mb);
+    let s='';
+    for(const v of niceTicks(y0,y1,4))s+=`<line class="pl-grid" x1="${ml}" x2="${W-mr}" y1="${f1(Y(v))}" y2="${f1(Y(v))}"/><text class="pl-tick" x="${ml-6}" y="${f1(Y(v))}" text-anchor="end" dominant-baseline="middle">${fmt(v,1)}</text>`;
+    for(const v of niceTicks(lo,hi,6))s+=`<line class="pl-grid" x1="${f1(X(v))}" x2="${f1(X(v))}" y1="${H-mb}" y2="${H-mb+4}"/><text class="pl-tick" x="${f1(X(v))}" y="${H-mb+17}" text-anchor="middle">${fmt(v,1)}</text>`;
+    s+=`<line class="pl-zero" x1="${ml}" x2="${W-mr}" y1="${f1(Y(0))}" y2="${f1(Y(0))}"/>`;
+    s+=`<polyline class="pl-curve" points="${xs.map((L,i)=>f1(X(L))+','+f1(Y(ys[i]))).join(' ')}"/>`;
+    found.forEach(i=>{s+=`<circle class="pl-root" cx="${f1(X(E.roots[i].v))}" cy="${f1(Y(0))}" r="6"/>`});
+    s+=`<line class="pl-mark" x1="${f1(X(lam))}" x2="${f1(X(lam))}" y1="${mt}" y2="${H-mb}"/><circle class="pl-dot" cx="${f1(X(lam))}" cy="${f1(Y(p(lam)))}" r="5"/>`;
+    s+=`<text class="pl-ax" x="${W-mr}" y="${H-mb-8}" text-anchor="end">λ</text><text class="pl-ax" x="${ml+6}" y="${mt+12}">det(A − λI)</text>`;
+    pdyn.innerHTML=s;
+  }
+  function paintStatus(){
+    if(E.complex){status.textContent=`The graph never reaches 0, so there are no real eigenvalues. The roots are the complex pair ${eigList(E)} (§5.5).`;return}
+    const n=E.roots.length,lst=E.roots.map((r,i)=>found.has(i)?`λ = ${fmt(r.v)}${r.m===2?' (multiplicity 2)':''}`:null).filter(Boolean);
+    status.innerHTML=`<b>${found.size} of ${n}</b> ${n===1?'root':'roots'} found${lst.length?': '+lst.join(' and '):''}.`+(n===1?' This polynomial has one repeated root.':'');
+  }
+  function update(){
+    const B=[[A[0][0]-lam,A[0][1]],[A[1][0],A[1][1]-lam]],dB=det(B),c1=[B[0][0],B[1][0]],c2=[B[0][1],B[1][1]];
+    let ri=-1;if(!E.complex)E.roots.forEach((r,i)=>{if(Math.abs(lam-r.v)<1e-9)ri=i});
+    const zero=ri>=0,allZero=zero&&len(c1)<1e-9&&len(c2)<1e-9;
+    const fresh=zero&&!found.has(ri);if(fresh)found.add(ri);
+    let s=pl.grid(gstep(pl.Rx));
+    if(allZero)s+=pl.wash('A − λI sends every vector to 0');
+    else if(zero)s+=pl.band(nullDir(B),'sent to 0: the eigenspace',0.8);
+    s+=pl.poly([[0,0],[1,0],[1,1],[0,1]],'shape-x')+pl.poly([[0,0],c1,add(c1,c2),c2],'par');
+    s+=pl.arrow([0,0],c1,'vax','(A−λI)e₁','ax')+pl.arrow([0,0],c2,'vax','(A−λI)e₂','ax');
+    dyn.innerHTML=s;drawPlot();
+    out.textContent=fmt(lam);
+    const formula=`(${fmt(A[0][0])} − λ)(${fmt(A[1][1])} − λ) − (${fmt(A[0][1])})(${fmt(A[1][0])})`;
+    const verdict=allZero?`A − λI is the zero matrix, so every vector solves (A − λI)x = 0. Every nonzero vector is an eigenvector for λ = ${fmt(lam)}.`
+      :zero?`<b>λ = ${fmt(lam)} is an eigenvalue.</b> The parallelogram has collapsed to a segment: A − λI flattens the plane and sends the highlighted line to 0. That line is the eigenspace.`
+      :`The parallelogram's area is |det| = ${fmt(Math.abs(dB))}. A − λI is invertible, so only x = 0 solves (A − λI)x = 0, and λ = ${fmt(lam)} is not an eigenvalue.`;
+    read.innerHTML=`<span class="mono">det(A − λI) = ${formula} = <b>${fmt(dB,3)}</b></span><span class="verdict${zero?' yes':''}">${verdict}</span>`;
+    S.setAttribute('aria-valuetext',`λ = ${fmt(lam)}. det(A − λI) = ${fmt(dB)}.`+(zero?' This is an eigenvalue.':''));
+    paintStatus();
+    Sound.hum(Math.min(1,Math.abs(dB)/pmax));if(zero&&!wasZero)Sound.chime();wasZero=zero;
+    if(fresh){say(`Found the eigenvalue ${fmt(lam)}.`);if(!E.complex&&E.roots.length===2&&found.size===2)completeTask('hunt-1')}
+  }
+  matrixPicker('h','ex2',setMatrix);
+  S.addEventListener('input',()=>setLam(+S.value));
+  dragOn(plot,e=>{const m=plot.getScreenCTM();if(!m)return;const q=new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse());setLam(lo+(q.x-ml)/(W-ml-mr)*(hi-lo))});
+  $('#h-jump').onclick=()=>{
+    if(E.complex){say('There are no real roots to jump to.');return}
+    const rs=E.roots.map(r=>r.v).sort((a,b)=>a-b),nx=rs.find(v=>v>lam+1e-9);
+    setLam(nx===undefined?rs[0]:nx,false);
+  };
+})();
+
+// ================= Stop 4: eigen-coordinates and powers of A
+(function(){
+  const sL=$('#d-svg'),sR=$('#d-svg2'),pl=new Plane(sL,3),pr=new Plane(sR,3),dl=$('.dyn',sL),dr=$('.dyn',sR),h=$('.handle',sL);
+  const l1=$('#d-l1'),l2=$('#d-l2'),a1=$('#d-a1'),a2=$('#d-a2'),read=$('#d-read'),mats=$('#d-mats'),warn=$('#d-warn');
+  const PRE={
+    grow:{l1:1.25,l2:0.7,v1:unit(20),v2:unit(115),x0:[0.3,1.6],R:3},
+    markov:{l1:1,l2:0.92,v1:[3,5],v2:[1,-1],x0:[0.6,0.4],R:1},
+    flip:{l1:-1.15,l2:0.8,v1:unit(160),v2:unit(60),x0:[1.2,1.3],R:3},
+  };
+  let st,k=0,P,Pi,ok=true,s1=1,s2=1,xk=[0,0];
+  const coords=x=>mv(Pi,x),at=(c,j)=>[c[0]*st.l1**j,c[1]*st.l2**j],toX=c=>add(sc(st.v1,c[0]),sc(st.v2,c[1]));
+  const snapL=v=>{for(const c of[0,1,-1])if(Math.abs(v-c)<0.02)return c;return v};
+  // The right panel's grid cells are exactly the slanted cells of the left panel, straightened out
+  function rescale(){
+    pl.set(st.R);P=colsOf(st.v1,st.v2);
+    ok=lineDiff(angOf(st.v1),angOf(st.v2))>=2;
+    Pi=ok?inv(P):[[0,0],[0,0]];
+    s1=st.R/3/len(st.v1);s2=st.R/3/len(st.v2);pr.set(3.5*s1,3.5*s2);
+  }
+  function load(key){
+    const q=PRE[key];st={l1:q.l1,l2:q.l2,v1:q.v1.slice(),v2:q.v2.slice(),x0:q.x0.slice(),R:q.R};k=0;
+    l1.value=q.l1;l2.value=q.l2;a1.value=Math.round(angOf(q.v1)%180);a2.value=Math.round(angOf(q.v2)%180);
+    ['grow','markov','flip'].forEach(n=>$('#d-p-'+n).setAttribute('aria-pressed',String(n===key)));
+    rescale();update();
+  }
+  function update(){
+    const R=st.R;
+    $('#d-l1-out').textContent=fmt(st.l1);$('#d-l2-out').textContent=fmt(st.l2);
+    $('#d-a1-out').textContent=`${Math.round(angOf(st.v1)%180)}°`;$('#d-a2-out').textContent=`${Math.round(angOf(st.v2)%180)}°`;
+    $('#d-k').textContent=` · k = ${k}`;
+    warn.hidden=ok;['d-step','d-step10'].forEach(id=>{$('#'+id).disabled=!ok});
+    let s=pl.grid(gstep(R)),t='';
+    let c0=[0,0],ck=[0,0];xk=st.x0;
+    if(ok){
+      for(let m=-14;m<=14;m++)if(m)s+=pl.line(st.v1,'elat',sc(st.v2,m*s2))+pl.line(st.v2,'elat',sc(st.v1,m*s1));
+      s+=pl.band(st.v1,`v₁ · λ₁ = ${fmt(st.l1)}`,0.86)+pl.band(st.v2,`v₂ · λ₂ = ${fmt(st.l2)}`,0.6);
+      c0=coords(st.x0);ck=at(c0,k);xk=toX(ck);
+      const trail=[],ctrail=[];for(let j=0;j<=k;j++){const c=at(c0,j);ctrail.push(c);trail.push(toX(c))}
+      const p1=sc(st.v1,ck[0]);
+      s+=pl.seg([0,0],p1,'decomp')+pl.seg(p1,xk,'decomp')+pl.polyline(trail,'trail');
+      trail.forEach((q,j)=>{if(j&&j<k)s+=pl.dot(q,'tdot',2.6)});
+      if(k)s+=pl.arrow([0,0],xk,'vax',`x${sub(k)}`,'ax');
+      t+=pr.grid(s1,s2)+pr.text([386,186],'c₁','eig')+pr.text([216,14],'c₂','eig');
+      t+=pr.seg([ck[0],0],ck,'decomp')+pr.seg([0,ck[1]],ck,'decomp')+pr.polyline(ctrail,'trail');
+      ctrail.forEach((q,j)=>{if(j&&j<k)t+=pr.dot(q,'tdot',2.6)});
+      if(k)t+=pr.arrow([0,0],ck,'vax',`x${sub(k)}`,'ax');
+      t+=pr.arrow([0,0],c0,'vx','x₀','x');
+    }else s+=pl.band(st.v1,'v₁ and v₂',0.8);
+    s+=pl.arrow([0,0],st.x0,'vx','x₀','x');
+    dl.innerHTML=s;dr.innerHTML=t;pl.handleAt(h,st.x0);
+    h.setAttribute('aria-valuenow',String(Math.round(st.x0[0]*100)/100));
+    h.setAttribute('aria-valuetext',`x₀ = ${vec(st.x0)}`+(ok?`, eigen-coordinates ${vec(c0,3)}`:''));
+    if(ok){
+      const away=len(xk)>1.45*R?` <span class="hintline">x${sub(k)} is off the picture (length ${fmt(len(xk))}).</span>`:'';
+      read.innerHTML=`<span><b>[x₀]<sub>B</sub></b> = (c₁, c₂) = ${vec(c0,3)}, so x₀ = ${fmt(c0[0],3)}v₁ + ${fmt(c0[1],3)}v₂.</span>`+
+        (k?`<span>After k = ${k}: (c₁λ₁${sup(k)}, c₂λ₂${sup(k)}) = ${vec(ck,3)}, so x${sub(k)} = A${sup(k)}x₀ = ${vec(xk,3)}.${away}</span>`:'<span>Apply A to watch each eigen-coordinate get multiplied by its own λ.</span>');
+      const A=mm(mm(P,[[st.l1,0],[0,st.l2]]),Pi);
+      mats.innerHTML=`<span class="mrow"><span class="eq">P = [v₁ v₂] =</span>${matHTML(P)}</span><span class="mrow"><span class="eq">D =</span>${matHTML([[st.l1,0],[0,st.l2]])}</span><span class="mrow"><span class="eq">A = PDP⁻¹ =</span>${matHTML(A)}</span>`;
+      const big0=Math.abs(c0[0])*len(st.v1)>1e-9,big1=Math.abs(c0[1])*len(st.v2)>1e-9;
+      if(k>=3&&big0!==big1)completeTask('split-1');
+      if(k>=5&&Math.abs(st.l1)<1&&Math.abs(st.l2)<1)completeTask('split-2');
+    }else{read.innerHTML='';mats.innerHTML=''}
+  }
+  // Moves x0; drops it exactly onto an eigenline when it lands close to one
+  function setX0(p,snap){
+    const R=st.R;p=[Math.max(-R,Math.min(R,p[0])),Math.max(-R,Math.min(R,p[1]))];
+    if(snap&&ok){
+      const c=coords(p),n0=Math.abs(c[0])*len(st.v1),n1=Math.abs(c[1])*len(st.v2);
+      if(n0<0.05*R&&n1>=0.05*R)c[0]=0;else if(n1<0.05*R&&n0>=0.05*R)c[1]=0;
+      p=toX(c);
+    }
+    if(len(p)<0.03*R)return;
+    st.x0=p;k=0;update();
+  }
+  dragOn(sL,e=>{const p=pl.world(e);if(p)setX0(p,true)});
+  h.addEventListener('keydown',e=>{const d=ARROWS[e.key];if(!d)return;e.preventDefault();setX0(add(st.x0,sc(d,st.R/30*(e.shiftKey?5:1))),false)});
+  l1.addEventListener('input',()=>{st.l1=snapL(+l1.value);update()});
+  l2.addEventListener('input',()=>{st.l2=snapL(+l2.value);update()});
+  a1.addEventListener('input',()=>{st.v1=unit(+a1.value);rescale();update()});
+  a2.addEventListener('input',()=>{st.v2=unit(+a2.value);rescale();update()});
+  ['grow','markov','flip'].forEach(n=>{$('#d-p-'+n).onclick=()=>load(n)});
+  const step=n=>{if(!ok)return;k=Math.min(400,k+n);update();say(`k = ${k}. x${k} = ${vec(xk)}.`)};
+  $('#d-step').onclick=()=>step(1);$('#d-step10').onclick=()=>step(10);
+  $('#d-reset').onclick=()=>{k=0;update();say('Back to x₀.')};
+  load('grow');
+})();
+
+// ================= Stop 5: push two eigenvalues together
+(function(){
+  const svg=$('#c-svg'),pl=new Plane(svg,3.4),dyn=$('.dyn',svg),par=$('#c-par'),name=$('#c-par-name'),out=$('#c-par-out'),side=$('#c-side'),read=$('#c-read');
+  let mode='shear',val=0.5;
+  const MODES={shear:{min:-1,max:1,step:0.01,init:0.5,name:'ε'},scale:{min:-1,max:1,step:0.01,init:0.5,name:'ε'},rot:{min:0,max:180,step:1,init:30,name:'φ, rotation angle'}};
+  function Aof(){
+    if(mode==='shear')return[[2,1],[0,2+val]];
+    if(mode==='scale')return[[2,0],[0,2+val]];
+    if(val===0)return[[1,0],[0,1]];if(val===180)return[[-1,0],[0,-1]];
+    const t=val*Math.PI/180;return[[Math.cos(t),-Math.sin(t)],[Math.sin(t),Math.cos(t)]];
+  }
+  function update(){
+    const A=Aof(),E=eig(A);
+    out.textContent=mode==='rot'?`${fmt(val)}°`:fmt(val);
+    let s=pl.grid(1)+pl.circle(1,'ring-x')+pl.curve(t=>mv(A,[Math.cos(t),Math.sin(t)]),'ring-ax'),dims=0;
+    if(!E.complex)E.lines.forEach((L,i)=>{
+      if(L.all){dims+=2;s+=pl.wash(`every direction: λ = ${fmt(L.lambda)}`);return}
+      dims+=1;s+=pl.band(L.dir,`λ = ${fmt(L.lambda)}`,i?0.62:0.88)+pl.arrow([0,0],sc(L.dir,L.lambda),'vax','','ax')+pl.arrow([0,0],L.dir,'vx thin','','x');
+    });
+    dyn.innerHTML=s;
+    const rows=E.complex?`<tr><td>${eigList(E)}</td><td>complex pair</td><td>no real eigenvector</td></tr>`
+      :E.lines.map(L=>`<tr><td>${fmt(L.lambda)}</td><td>${L.mult}</td><td>${L.all?2:1}</td></tr>`).join('');
+    let verdict,why;
+    if(E.complex){verdict='<span class="chip bad">No real eigenvalues</span>';why='A rotation by φ turns every direction, so there is no real eigenvector basis to build P from.'}
+    else if(dims>=2){
+      verdict='<span class="chip ok">Diagonalizable</span>';
+      why=E.roots.length===2?'Two distinct eigenvalues give two independent eigenvectors (Theorems 2 and 6).'
+        :`λ = ${fmt(E.roots[0].v)} is repeated, but its eigenspace is the whole plane, so it still supplies two independent eigenvectors (Theorem 7b).`;
+    }else{verdict='<span class="chip bad">Not diagonalizable</span>';why=`λ = ${fmt(E.roots[0].v)} has multiplicity 2 but a one-dimensional eigenspace. One line can't hold a basis for ℝ² (Theorem 7b).`}
+    let pRow='';
+    if(mode==='shear')pRow=val!==0?`<p class="mrow"><span class="eq">P = [v₁ v₂] =</span>${matHTML([[1,1],[0,val]])}<span class="eq">det P = ε = ${fmt(val)}</span></p>`
+      :`<p>P would have to be [1 1; 0 0], which is not invertible.</p>`;
+    side.innerHTML=`<p class="mrow"><span class="eq">A =</span>${matHTML(A)}</p><p class="mono">det(A − λI) = ${polyText(A)}${E.complex?'':' = '+factorText(E)}</p>
+      <table class="mini"><thead><tr><th scope="col">Eigenvalue</th><th scope="col">Multiplicity</th><th scope="col">Eigenspace dim.</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="meter"><span class="pip${dims>=1?' on':''}"></span><span class="pip${dims>=2?' on':''}"></span>${Math.min(dims,2)} of 2 independent eigenvectors</p>${pRow}`;
+    read.innerHTML=`<span>${verdict}</span><span>${why}</span>`;
+    par.setAttribute('aria-valuetext',`${MODES[mode].name} = ${fmt(val)}. ${verdict.replace(/<[^>]+>/g,'')}.`);
+    if(mode==='shear'&&val===0)completeTask('collide-1');
+    if(mode==='rot'&&(val===0||val===180))completeTask('collide-2');
+  }
+  function setMode(m){
+    mode=m;const M=MODES[m];par.min=M.min;par.max=M.max;par.step=M.step;par.value=M.init;val=M.init;name.textContent=M.name;update();
+  }
+  par.addEventListener('input',()=>{
+    let v=+par.value;
+    if(mode!=='rot'&&Math.abs(v)<0.015)v=0;
+    if(mode==='rot'){if(v<1.5)v=0;if(v>178.5)v=180}
+    val=v;update();
+  });
+  $$('input[name="c-mode"]').forEach(r=>r.addEventListener('change',()=>{if(r.checked)setMode(r.value)}));
+  setMode('shear');
+})();
+
+// ================= Stop 6: the B-matrix of x ↦ Ax
+(function(){
+  const svg=$('#b-svg'),pl=new Plane(svg,9),dyn=$('.dyn',svg),H=[$('#b-h1'),$('#b-h2')],sel=$('#b-preset'),showE=$('#b-eig'),panel=$('#b-panel');
+  const PRE={ex4:{A:[[7,2],[-4,1]],book:[[1,-1],[1,-2]]},ex5:{A:[[4,-9],[4,-8]],book:[[3,2],[2,1]]}};
+  let key='ex4',A,E,b=[[1,0],[0,1]],col=0,active=-1,lastState='';
+  // Whole-number points win first (so the textbook bases come out exact), then the eigenlines
+  function snapB(v){
+    const r=[Math.round(v[0]),Math.round(v[1])];
+    if(Math.hypot(v[0]-r[0],v[1]-r[1])<0.22&&len(r)>0)return r;
+    if(!E.complex)for(const L of E.lines)if(!L.all&&lineDiff(angOf(v),angOf(L.dir))<2.5)return sc(L.dir,dot(v,L.dir));
+    return v;
+  }
+  function update(){
+    const P=colsOf(b[0],b[1]),basis=Math.abs(det(P))>1e-6,T=b.map(v=>mv(A,v));
+    let s=pl.grid(1);
+    if(showE.checked&&!E.complex)E.lines.forEach((L,i)=>{s+=L.all?pl.wash():pl.band(L.dir,`eigenline · λ = ${fmt(L.lambda)}`,i?0.55:0.86)});
+    let M=null;
+    if(basis){M=mm(mm(inv(P),A),P);const p1=sc(b[0],M[0][col]);s+=pl.seg([0,0],p1,'decomp')+pl.seg(p1,T[col],'decomp')}
+    s+=pl.arrow([0,0],T[1-col],'vax faint',`T(b${sub(2-col)})`,'ax')+pl.arrow([0,0],T[col],'vax',`T(b${sub(col+1)})`,'ax');
+    s+=pl.arrow([0,0],b[0],'vx','b₁','x','mid')+pl.arrow([0,0],b[1],'vx','b₂','x','mid');
+    dyn.innerHTML=s;
+    b.forEach((v,i)=>{pl.handleAt(H[i],v);H[i].setAttribute('aria-valuenow',String(Math.round(v[0]*100)/100));H[i].setAttribute('aria-valuetext',`b${sub(i+1)} = ${vec(v)}`)});
+    if(!basis){panel.innerHTML='<p><span class="chip bad">Not a basis</span> b₁ and b₂ are on the same line. Move one of them.</p>';lastState='';return}
+    const tol=1e-6*(1+Math.abs(M[0][0])+Math.abs(M[1][1])),lowZero=Math.abs(M[1][0])<tol,upZero=Math.abs(M[0][1])<tol;
+    const diag=lowZero&&upZero,tri=!diag&&(lowZero||upZero);
+    let chip;
+    if(diag)chip='<span class="chip ok">Diagonal</span> Both basis vectors are eigenvectors, so T just stretches each one (Theorem 8).';
+    else if(tri)chip=`<span class="chip hint">Triangular</span> b${lowZero?'₁':'₂'} is an eigenvector, so T(b${lowZero?'₁':'₂'}) needs only itself.`+(key==='ex5'?' No basis does better here: A has only one eigenline.':'');
+    else chip='<span class="chip">Not diagonal</span> Each T(b<sub>j</sub>) needs both basis vectors.';
+    panel.innerHTML=`<p class="mrow"><span class="eq">[T]<sub>B</sub> =</span>${matHTML(M,'col'+(col+1))}</p>
+      <p>Column ${col+1} is [T(b${sub(col+1)})]<sub>B</sub>: T(b${sub(col+1)}) = ${fmt(M[0][col])}·b₁ + ${fmt(M[1][col])}·b₂.</p>
+      <p class="mrow"><span class="eq">P = [b₁ b₂] =</span>${matHTML(P)}<span class="eq">and [T]<sub>B</sub> = P⁻¹AP</span></p>
+      <dl class="inv"><div><dt>Trace</dt><dd>${fmt(tr(M))}</dd></div><div><dt>Det</dt><dd>${fmt(det(M))}</dd></div><div><dt>Eigenvalues</dt><dd>${eigList(eig(M))}</dd></div></dl>
+      <p>${chip}</p>`;
+    const state=diag?'diag':tri?'tri':'';
+    if(state&&state!==lastState){Sound.chime();say(diag?'[T]_B is diagonal.':'[T]_B is triangular.')}
+    lastState=state;
+    if(key==='ex4'&&diag)completeTask('basis-1');
+    if(key==='ex5'&&tri)completeTask('basis-2');
+  }
+  function setKey(k){key=k;A=PRE[k].A;E=eig(A);b=[[1,0],[0,1]];lastState='';update()}
+  dragOn(svg,(e,start)=>{
+    const p=pl.world(e);if(!p)return;
+    if(start){
+      const hit=e.target.closest&&e.target.closest('.handle');
+      if(hit)active=H.indexOf(hit);
+      else{const q=pl.P(p),d=b.map(v=>{const s=pl.P(v);return Math.hypot(s[0]-q[0],s[1]-q[1])});active=Math.min(...d)<40?(d[0]<=d[1]?0:1):-1}
+    }
+    if(active<0)return;
+    const v=snapB(p);if(len(v)<0.4)return;
+    b[active]=v;update();
+  });
+  H.forEach((hh,i)=>hh.addEventListener('keydown',e=>{const d=ARROWS[e.key];if(!d)return;e.preventDefault();const v=add(b[i],sc(d,e.shiftKey?0.1:1));if(len(v)<0.1)return;b[i]=v;update()}));
+  sel.onchange=()=>setKey(sel.value);
+  showE.onchange=update;
+  $$('input[name="b-col"]').forEach(r=>r.addEventListener('change',()=>{if(r.checked){col=+r.value;update()}}));
+  $('#b-std').onclick=()=>{b=[[1,0],[0,1]];update()};
+  $('#b-book').onclick=()=>{b=PRE[key].book.map(v=>v.slice());update()};
+  $('#b-snap').onclick=()=>{
+    if(E.complex)return;
+    const Ls=E.lines.filter(L=>!L.all);if(!Ls.length)return;
+    const proj=(v,d)=>{let t=dot(v,d);if(Math.abs(t)<1)t=t<0?-1.5:1.5;return sc(d,t)};
+    if(Ls.length>=2){
+      const cost=(i,j)=>lineDiff(angOf(b[0]),angOf(Ls[i].dir))+lineDiff(angOf(b[1]),angOf(Ls[j].dir));
+      const [La,Lb]=cost(0,1)<=cost(1,0)?[Ls[0],Ls[1]]:[Ls[1],Ls[0]];
+      b=[proj(b[0],La.dir),proj(b[1],Lb.dir)];
+    }else{
+      b[0]=proj(b[0],Ls[0].dir);
+      if(lineDiff(angOf(b[1]),angOf(Ls[0].dir))<1)b[1]=[-Ls[0].dir[1]*2,Ls[0].dir[0]*2];
+    }
+    update();
+  };
+  setKey('ex4');
+})();
+
+// ================= Stop 7: true or false
+(function(){
+  const Q=[
+    {s:'If Ax = λx for some vector x, then λ is an eigenvalue of A.',a:false,why:'x has to be nonzero. A0 = λ0 holds for every λ.',stop:'turn'},
+    {s:'You can read the eigenvalues of A off an echelon form of A.',a:false,why:'Row operations usually change eigenvalues. Only a triangular A itself shows them on its diagonal (Theorem 1).',stop:'hunt'},
+    {s:'A is invertible exactly when 0 is not an eigenvalue of A.',a:true,why:'λ = 0 means some nonzero x has Ax = 0, so A crushes a line to 0 (Invertible Matrix Theorem, statement r).',stop:'stretch'},
+    {s:'Eigenvectors that belong to distinct eigenvalues are linearly independent.',a:true,why:'A line can’t be stretched by two different factors at once (Theorem 2).',stop:'collide'},
+    {s:'A 2×2 matrix with a repeated eigenvalue can’t be diagonalized.',a:false,why:'2I has λ = 2 twice and is already diagonal. Compare the eigenspace dimension with the multiplicity (Theorem 7).',stop:'collide'},
+    {s:'If A is diagonalizable, then A is invertible.',a:false,why:'D can have a 0 on its diagonal. Diagonalizable is about having enough eigenvectors; invertible is about 0 not being an eigenvalue.',stop:'split'},
+    {s:'In A = PDP⁻¹, column k of P is an eigenvector for the k-th diagonal entry of D.',a:true,why:'That is the Diagonalization Theorem: AP = PD says A times each column of P is that column times its λ (Theorem 5).',stop:'split'},
+    {s:'Two matrices with the same eigenvalues are similar.',a:false,why:'[2 1; 0 2] and [2 0; 0 2] share eigenvalues but are not similar (§5.2 warning). Theorem 4 only goes one way.',stop:'collide'},
+    {s:'[T]_B is diagonal exactly when every vector in B is an eigenvector of T.',a:true,why:'Column j is [T(b_j)]_B, which is a multiple of e_j exactly when T(b_j) = λb_j (Theorem 8).',stop:'basis'},
+  ];
+  const box=$('#quiz'),name=id=>STOPS.find(s=>s.id===id).short;
+  box.innerHTML=Q.map((q,i)=>`<li class="q" id="q${i}"><p>${i+1}. ${q.s}</p><div class="row" role="group" aria-label="Statement ${i+1}"><button type="button" data-i="${i}" data-a="T" aria-pressed="false">True</button><button type="button" data-i="${i}" data-a="F" aria-pressed="false">False</button></div><p class="qf"></p></li>`).join('');
+  function paint(i){
+    const a=saved.quiz[i],q=Q[i],li=$('#q'+i),fb=$('.qf',li);
+    $$('button',li).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.a===a)));
+    if(!a){fb.innerHTML='';li.className='q';return}
+    const right=(a==='T')===q.a;li.className='q '+(right?'right':'wrong');
+    fb.innerHTML=`<b>${right?'Right.':'Not quite.'}</b> It’s ${q.a?'true':'false'}. ${q.why} <a href="#${q.stop}" data-go="${q.stop}">Revisit “${name(q.stop)}”</a>`;
+  }
+  function score(){
+    const n=Object.keys(saved.quiz).length,c=Q.filter((q,i)=>saved.quiz[i]&&((saved.quiz[i]==='T')===q.a)).length;
+    $('#q-score').textContent=`${c} of ${Q.length} right · ${n} answered`;
+    if(n===Q.length)completeTask('recap-1');
+  }
+  Q.forEach((q,i)=>paint(i));score();
+  $$('.qf',box).forEach(p=>p.setAttribute('aria-live','polite'));
+  box.addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(!b)return;saved.quiz[b.dataset.i]=b.dataset.a;persist();paint(+b.dataset.i);score()});
+  $('#q-reset').onclick=()=>{saved.quiz={};persist();Q.forEach((q,i)=>paint(i));score();say('Answers cleared.')};
+  $('#all-reset').onclick=()=>{saved.tasks={};saved.quiz={};persist();$$('[data-task]').forEach(li=>paintTask(li,false));Q.forEach((q,i)=>paint(i));score();paintRail();say('Every challenge and answer has been reset.')};
+})();
+
+// ---------- start
+$$('[data-task]').forEach(li=>paintTask(li,!!saved.tasks[li.dataset.task]));
+{const h=location.hash.slice(1);go(STOPS.some(s=>s.id===h)?h:(saved.stop||'turn'),false)}
+function typeset(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise($$('.earns, .path')).catch(()=>{})}
+if(window.MathJax&&MathJax.startup&&MathJax.startup.promise)MathJax.startup.promise.then(typeset);else window.addEventListener('load',typeset);
+</script>
