@@ -1,0 +1,209 @@
+<title>Math 54 Eigenvalue Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: one textbook box centred per slide, thin control bars top and bottom, like flipping cards */
+:root{
+  --bg:#f3f4f7; --fg:#1d1f27; --muted:#626779; --line:#d8dbe4; --panel:#ffffff;
+  --thm:#6a3fb5; --thm-fill:#f3eefc; --thm-edge:#b9a2e6;
+  --fact:#23805a; --fact-fill:#ebf6ef; --fact-edge:#99cfb3;
+  --warn:#9a5b00; --warn-fill:#fff3dc;
+  --mark:#b3261e; --mark-fill:#fdeceb;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --label:"IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15161c; --fg:#e7e8ee; --muted:#9a9eb0; --line:#2c2f3b; --panel:#1d1f27;
+  --thm:#c3a6ff; --thm-fill:#231c36; --thm-edge:#5b4390;
+  --fact:#7fd8ae; --fact-fill:#152a21; --fact-edge:#2f6b50;
+  --warn:#ffc46b; --warn-fill:#33270f;
+  --mark:#ff9f96; --mark-fill:#3a1a18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15161c; --fg:#e7e8ee; --muted:#9a9eb0; --line:#2c2f3b; --panel:#1d1f27;
+  --thm:#c3a6ff; --thm-fill:#231c36; --thm-edge:#5b4390;
+  --fact:#7fd8ae; --fact-fill:#152a21; --fact-edge:#2f6b50;
+  --warn:#ffc46b; --warn-fill:#33270f;
+  --mark:#ff9f96; --mark-fill:#3a1a18; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--serif);margin:0;display:flex;flex-direction:column}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;border-bottom:1px solid var(--line);font-family:var(--label)}
+.bar.bottom{border-bottom:0;border-top:1px solid var(--line)}
+.brand{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
+select,button{font-family:var(--label);font-size:14px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:2px solid var(--thm);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.stage{flex:1;min-height:0;overflow:auto;display:flex;padding:20px 16px;touch-action:pan-y}
+.slide{margin:auto;width:100%;max-width:760px;min-width:0}
+.eyebrow{font-family:var(--label);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap}
+.box{border:1.5px solid var(--edge);background:var(--fill);border-radius:4px;padding:22px 24px;box-shadow:inset 5px 0 0 var(--ink)}
+.box.thm{--edge:var(--thm-edge);--fill:var(--thm-fill);--ink:var(--thm)}
+.box.fact{--edge:var(--fact-edge);--fill:var(--fact-fill);--ink:var(--fact)}
+.box h2{font-family:var(--label);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--ink);margin:0 0 12px;text-wrap:balance}
+.box .body{font-size:clamp(17px,2.3vw,21px);line-height:1.55}
+.box .body p{margin:0 0 .6em}.box .body p:last-child{margin-bottom:0}
+.box ol,.box ul{margin:.2em 0 .6em;padding-left:1.5em}
+.box li{margin:.15em 0}
+ol.alpha{list-style:lower-alpha}
+.tag{font-family:var(--label);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--warn-fill);color:var(--warn)}
+.tag.mark{background:var(--mark-fill);color:var(--mark)}
+button.review[aria-pressed="true"]{background:var(--mark-fill);color:var(--mark);border-color:var(--mark)}
+button:disabled{opacity:.5;cursor:default}
+.empty{margin:auto;max-width:34ch;text-align:center;color:var(--muted);font-size:18px;line-height:1.5}
+.note{font-size:15px;color:var(--muted);margin-top:14px;font-style:italic}
+.math-scroll{overflow-x:auto;max-width:100%}
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.count{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);min-width:7ch;text-align:center}
+.progress{flex:1 1 120px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;min-width:60px}
+.progress i{display:block;height:100%;background:var(--fg);width:0;transition:width .2s}
+.hint{font-size:12px;color:var(--muted)}
+@media (max-width:520px){.hint{display:none}.box{padding:18px 16px}}
+@media (prefers-reduced-motion:reduce){.progress i{transition:none}}
+</style>
+
+<div class="bar">
+  <span class="brand">Math 54 · §5.1–5.4 boxes</span>
+  <label for="sec" hidden>Jump to section</label>
+  <select id="sec" aria-label="Jump to section"></select>
+  <div class="seg" role="group" aria-label="Show">
+    <button id="f-all" aria-pressed="true">All</button>
+    <button id="f-thm" aria-pressed="false">Theorems</button>
+    <button id="f-fact" aria-pressed="false">Facts</button>
+  </div>
+  <button id="f-rev" class="review" aria-pressed="false">Review only (0)</button>
+</div>
+<main class="stage" id="stage" aria-live="polite"><p class="empty" id="empty" hidden>Nothing marked for review here yet. Turn off “Review only”, then press R on any slide to mark it.</p></main>
+<div class="bar bottom">
+  <button id="prev" aria-label="Previous slide">← Prev</button>
+  <span class="count" id="count">1 / 1</span>
+  <button id="next" aria-label="Next slide">Next →</button>
+  <button id="mark" class="review" aria-pressed="false">☆ Mark for review</button>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <span class="hint">← → keys, or tap the left / right side · R marks for review</span>
+</div>
+
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'},startup:{typeset:false}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<script>
+const T='thm',F='fact';
+const S=[
+// ---------- 5.1
+['5.1',F,'Definition · Eigenvector and eigenvalue',String.raw`<p>An <b>eigenvector</b> of an $n\times n$ matrix $A$ is a nonzero vector $\mathbf x$ such that $A\mathbf x=\lambda\mathbf x$ for some scalar $\lambda$. A scalar $\lambda$ is called an <b>eigenvalue</b> of $A$ if there is a nontrivial solution $\mathbf x$ of $A\mathbf x=\lambda\mathbf x$; such an $\mathbf x$ is called an <i>eigenvector corresponding to $\lambda$</i>.</p><p class="note">An eigenvector must be nonzero, but an eigenvalue may be zero.</p>`],
+['5.1',F,'Definition · Eigenspace',String.raw`<p>$\lambda$ is an eigenvalue of an $n\times n$ matrix $A$ if and only if the equation</p>$$(A-\lambda I)\mathbf x=\mathbf 0$$<p>has a nontrivial solution. The set of <i>all</i> solutions of this equation is the null space of $A-\lambda I$, so it is a subspace of $\mathbb R^n$, called the <b>eigenspace</b> of $A$ corresponding to $\lambda$. The eigenspace consists of the zero vector and all the eigenvectors corresponding to $\lambda$.</p>`],
+['5.1',F,'Warning · Row reduction and eigenvalues',String.raw`<p>Row reduction can be used to find eigen<i>vectors</i>, but it cannot be used to find eigen<i>values</i>. An echelon form of a matrix $A$ usually does <i>not</i> display the eigenvalues of $A$.</p>`],
+['5.1',T,'Theorem 1',String.raw`<p>The eigenvalues of a triangular matrix are the entries on its main diagonal.</p>`],
+['5.1',F,'Zero as an eigenvalue',String.raw`<p>$0$ is an eigenvalue of $A$ if and only if $A$ is not invertible.</p><p class="note">$A\mathbf x=0\mathbf x$ is the same as $A\mathbf x=\mathbf 0$, which has a nontrivial solution exactly when $A$ is not invertible.</p>`],
+['5.1',T,'Theorem 2',String.raw`<p>If $\mathbf v_1,\dots,\mathbf v_r$ are eigenvectors that correspond to distinct eigenvalues $\lambda_1,\dots,\lambda_r$ of an $n\times n$ matrix $A$, then the set $\{\mathbf v_1,\dots,\mathbf v_r\}$ is linearly independent.</p>`],
+['5.1',F,'Eigenvectors and difference equations',String.raw`<p>If $A$ is an $n\times n$ matrix, then</p>$$\mathbf x_{k+1}=A\mathbf x_k\quad(k=0,1,2,\dots)$$<p>is a recursive description of a sequence $\{\mathbf x_k\}$ in $\mathbb R^n$. If $\mathbf x_0$ is an eigenvector with corresponding eigenvalue $\lambda$, then</p>$$\mathbf x_k=\lambda^k\mathbf x_0\quad(k=1,2,\dots)$$<p>is a solution, because $A\mathbf x_k=A(\lambda^k\mathbf x_0)=\lambda^k(A\mathbf x_0)=\lambda^k(\lambda\mathbf x_0)=\lambda^{k+1}\mathbf x_0=\mathbf x_{k+1}$.</p><p>Linear combinations of solutions of this form are solutions, too.</p>`],
+// ---------- 5.2
+['5.2',T,'Theorem 3 · Properties of Determinants',String.raw`<p>Let $A$ and $B$ be $n\times n$ matrices.</p><ol class="alpha"><li>$A$ is invertible if and only if $\det A\neq0$.</li><li>$\det AB=(\det A)(\det B)$.</li><li>$\det A^T=\det A$.</li><li>If $A$ is triangular, then $\det A$ is the product of the entries on the main diagonal of $A$.</li><li>A row replacement operation on $A$ does not change the determinant. A row interchange changes the sign of the determinant. A row scaling also scales the determinant by the same scalar factor.</li></ol>`],
+['5.2',T,'The Invertible Matrix Theorem (continued)',String.raw`<p>Let $A$ be an $n\times n$ matrix. Then $A$ is invertible if and only if</p><ol class="alpha" start="18"><li>The number $0$ is <i>not</i> an eigenvalue of $A$.</li></ol><p class="note">Continues the list from §2.3 Theorem 8 (and $\det A\neq0$ from §3.2).</p>`],
+['5.2',F,'The characteristic equation',String.raw`<p>The scalar equation $\det(A-\lambda I)=0$ is called the <b>characteristic equation</b> of $A$.</p><p>A scalar $\lambda$ is an eigenvalue of an $n\times n$ matrix $A$ if and only if $\lambda$ satisfies the characteristic equation</p>$$\det(A-\lambda I)=0$$`],
+['5.2',F,'Definition · Characteristic polynomial and multiplicity',String.raw`<p>If $A$ is an $n\times n$ matrix, then $\det(A-\lambda I)$ is a polynomial of degree $n$ called the <b>characteristic polynomial</b> of $A$.</p><p>The (<b>algebraic</b>) <b>multiplicity</b> of an eigenvalue $\lambda$ is its multiplicity as a root of the characteristic equation.</p><p class="note">The characteristic equation has exactly $n$ roots, counting multiplicities, provided complex roots are allowed (§5.5).</p>`],
+['5.2',F,'Definition · Similarity',String.raw`<p>If $A$ and $B$ are $n\times n$ matrices, then $A$ <b>is similar to</b> $B$ if there is an invertible matrix $P$ such that $P^{-1}AP=B$, or, equivalently, $A=PBP^{-1}$. Writing $Q$ for $P^{-1}$, we have $Q^{-1}BQ=A$. So $B$ is also similar to $A$, and we say simply that $A$ and $B$ <b>are similar</b>.</p><p>Changing $A$ into $P^{-1}AP$ is called a <b>similarity transformation</b>.</p>`],
+['5.2',T,'Theorem 4',String.raw`<p>If $n\times n$ matrices $A$ and $B$ are similar, then they have the same characteristic polynomial and hence the same eigenvalues (with the same multiplicities).</p>`],
+['5.2',F,'Warnings · Similarity',String.raw`<ol><li>The matrices $$\begin{bmatrix}2&1\\0&2\end{bmatrix}\quad\text{and}\quad\begin{bmatrix}2&0\\0&2\end{bmatrix}$$ are not similar even though they have the same eigenvalues.</li><li>Similarity is not the same as row equivalence. (If $A$ is row equivalent to $B$, then $B=EA$ for some invertible matrix $E$.) Row operations on a matrix usually change its eigenvalues.</li></ol>`],
+['5.2',F,'Application to dynamical systems',String.raw`<p>To analyze $\mathbf x_{k+1}=A\mathbf x_k$, find the eigenvalues of $A$ and a basis for each eigenspace, then write $\mathbf x_0$ in terms of eigenvectors:</p>$$\mathbf x_0=c_1\mathbf v_1+c_2\mathbf v_2,\qquad A\mathbf v_1=\lambda_1\mathbf v_1,\ A\mathbf v_2=\lambda_2\mathbf v_2.$$<p>By linearity of $\mathbf x\mapsto A\mathbf x$,</p>$$\mathbf x_k=c_1\lambda_1^k\mathbf v_1+c_2\lambda_2^k\mathbf v_2\quad(k=0,1,2,\dots)$$<p class="note">Example 5: with $\lambda_1=1$ and $\lambda_2=.92$, $(.92)^k\to0$, so $\mathbf x_k\to c_1\mathbf v_1$.</p>`],
+// ---------- 5.3
+['5.3',F,'Powers of a diagonalizable matrix',String.raw`<p>If $D$ is diagonal, $D^k$ is diagonal with each diagonal entry raised to the $k$th power; for example</p>$$D=\begin{bmatrix}5&0\\0&3\end{bmatrix}\ \Rightarrow\ D^k=\begin{bmatrix}5^k&0\\0&3^k\end{bmatrix}.$$<p>If $A=PDP^{-1}$ for some invertible $P$ and diagonal $D$, then</p>$$A^k=PD^kP^{-1}\quad(k\ge1),$$<p>since $A^2=(PDP^{-1})(PDP^{-1})=PD(P^{-1}P)DP^{-1}=PD^2P^{-1}$, and so on.</p>`],
+['5.3',F,'Definition · Diagonalizable',String.raw`<p>A square matrix $A$ is said to be <b>diagonalizable</b> if $A$ is similar to a diagonal matrix, that is, if $A=PDP^{-1}$ for some invertible matrix $P$ and some diagonal matrix $D$.</p>`],
+['5.3',T,'Theorem 5 · The Diagonalization Theorem',String.raw`<p>An $n\times n$ matrix $A$ is diagonalizable if and only if $A$ has $n$ linearly independent eigenvectors.</p><p>In fact, $A=PDP^{-1}$, with $D$ a diagonal matrix, if and only if the columns of $P$ are $n$ linearly independent eigenvectors of $A$. In this case, the diagonal entries of $D$ are eigenvalues of $A$ that correspond, respectively, to the eigenvectors in $P$.</p><p class="note">In other words, $A$ is diagonalizable if and only if there are enough eigenvectors to form a basis of $\mathbb R^n$. Such a basis is called an <b>eigenvector basis</b> of $\mathbb R^n$.</p>`],
+['5.3',F,'Diagonalizing a matrix',String.raw`<ol><li><b>Find the eigenvalues of $A$.</b></li><li><b>Find $n$ linearly independent eigenvectors of $A$.</b> This is the critical step. If it fails, Theorem 5 says that $A$ cannot be diagonalized.</li><li><b>Construct $P$ from the vectors in step 2.</b> The vectors may be listed in any order.</li><li><b>Construct $D$ from the corresponding eigenvalues.</b> The order of the eigenvalues must match the order chosen for the columns of $P$. A repeated eigenvalue appears once for each of its eigenvectors.</li></ol><p class="note">To check without computing $P^{-1}$, verify that $AP=PD$ (and be sure $P$ is invertible).</p>`],
+['5.3',T,'Theorem 6',String.raw`<p>An $n\times n$ matrix with $n$ distinct eigenvalues is diagonalizable.</p><p class="note">It is not <i>necessary</i> for an $n\times n$ matrix to have $n$ distinct eigenvalues in order to be diagonalizable.</p>`],
+['5.3',T,'Theorem 7',String.raw`<p>Let $A$ be an $n\times n$ matrix whose distinct eigenvalues are $\lambda_1,\dots,\lambda_p$.</p><ol class="alpha"><li>For $1\le k\le p$, the dimension of the eigenspace for $\lambda_k$ is less than or equal to the multiplicity of the eigenvalue $\lambda_k$.</li><li>The matrix $A$ is diagonalizable if and only if the sum of the dimensions of the eigenspaces equals $n$, and this happens if and only if (i) the characteristic polynomial factors completely into linear factors and (ii) the dimension of the eigenspace for each $\lambda_k$ equals the multiplicity of $\lambda_k$.</li><li>If $A$ is diagonalizable and $\mathcal B_k$ is a basis for the eigenspace corresponding to $\lambda_k$ for each $k$, then the total collection of vectors in the sets $\mathcal B_1,\dots,\mathcal B_p$ forms an eigenvector basis for $\mathbb R^n$.</li></ol>`],
+// ---------- 5.4
+['5.4',F,'Definition · Eigenvector of a linear transformation',String.raw`<p>Let $V$ be a vector space. An <b>eigenvector</b> of a linear transformation $T:V\to V$ is a nonzero vector $\mathbf x$ in $V$ such that $T(\mathbf x)=\lambda\mathbf x$ for some scalar $\lambda$. A scalar $\lambda$ is called an <b>eigenvalue</b> of $T$ if there is a nontrivial solution $\mathbf x$ of $T(\mathbf x)=\lambda\mathbf x$; such an $\mathbf x$ is called an <b>eigenvector</b> corresponding to $\lambda$.</p>`],
+['5.4',F,'The matrix for T relative to a basis',String.raw`<p>Let $V$ be an $n$-dimensional vector space, $T:V\to V$ a linear transformation, and $\mathcal B=\{\mathbf b_1,\dots,\mathbf b_n\}$ a basis for $V$. Then</p>$$[T(\mathbf x)]_{\mathcal B}=M[\mathbf x]_{\mathcal B}$$<p>where</p>$$M=\begin{bmatrix}[T(\mathbf b_1)]_{\mathcal B}&[T(\mathbf b_2)]_{\mathcal B}&\cdots&[T(\mathbf b_n)]_{\mathcal B}\end{bmatrix}$$<p>The matrix $M$ is called the <b>matrix for $T$ relative to the basis $\mathcal B$</b> and is denoted by $[T]_{\mathcal B}$.</p><p class="note">So far as coordinate vectors are concerned, the action of $T$ on $\mathbf x$ may be viewed as left-multiplication by $M$.</p>`],
+['5.4',T,'Theorem 8 · Diagonal Matrix Representation',String.raw`<p>Suppose $A=PDP^{-1}$, where $D$ is a diagonal $n\times n$ matrix. If $\mathcal B$ is the basis for $\mathbb R^n$ formed from the columns of $P$, then $D$ is the $\mathcal B$-matrix for the transformation $\mathbf x\mapsto A\mathbf x$.</p>`],
+['5.4',F,'The B-matrix of x ↦ Ax',String.raw`<p>If $T:\mathbb R^n\to\mathbb R^n$ is defined by $T(\mathbf x)=A\mathbf x$, and $\mathcal B$ is any basis for $\mathbb R^n$, then the $\mathcal B$-matrix for $T$ is similar to $A$. If $P$ is the matrix whose columns come from the vectors in $\mathcal B$, then</p>$$[T]_{\mathcal B}=P^{-1}AP.$$<p>Conversely, if $A=PCP^{-1}$, then $C$ is the $\mathcal B$-matrix for $\mathbf x\mapsto A\mathbf x$ when the basis $\mathcal B$ is formed from the columns of $P$.</p>`],
+['5.4',F,'Similarity of matrix representations',String.raw`<p>The set of all matrices similar to a matrix $A$ coincides with the set of all matrix representations of the transformation $\mathbf x\mapsto A\mathbf x$.</p>`],
+];
+
+const stage=document.getElementById('stage');
+const els=S.map(([sec,kind,title,body,nt],i)=>{
+  const d=document.createElement('article');d.className='slide';d.hidden=true;
+  d.innerHTML=`<div class="eyebrow"><span>§${sec}</span><span>·</span><span>${kind===T?'Theorem box':'Fact box'}</span>${nt?'<span class="tag">Not tested · for intuition</span>':''}<span class="tag mark" hidden>★ Marked for review</span></div>
+  <section class="box ${kind}"><h2>${title}</h2><div class="body">${body}</div></section>`;
+  stage.appendChild(d);return d;
+});
+let filter='all',order=[],pos=0;
+// Marks are keyed by section+title, not slide index, so they survive slides being added or reordered
+const MARKS_KEY='m54deck5-marks',MARK_SHORTCUT='r';
+const keyOf=i=>`${S[i][0]}|${S[i][2]}`;
+let marks=new Set(),reviewOnly=false,cur=0;
+try{marks=new Set(JSON.parse(localStorage.getItem(MARKS_KEY))||[])}catch(e){}
+const markBtn=document.getElementById('mark'),revBtn=document.getElementById('f-rev'),emptyEl=document.getElementById('empty');
+const secSel=document.getElementById('sec');
+function rebuild(keepIdx){
+  order=S.map((s,i)=>i).filter(i=>(filter==='all'||S[i][1]===filter)&&(!reviewOnly||marks.has(keyOf(i))));
+  const secs=[...new Set(order.map(i=>S[i][0]))];
+  secSel.innerHTML=secs.map(s=>`<option value="${s}">§${s}</option>`).join('');
+  const p=order.indexOf(keepIdx);pos=p>=0?p:Math.max(0,order.findIndex(i=>i>keepIdx));
+  if(pos<0)pos=0;show();
+}
+/* Reflects the mark state in the slide tag, the toggle button and the review counter */
+function paintMarks(i){
+  const on=i!==undefined&&marks.has(keyOf(i));
+  if(i!==undefined)els[i].querySelector('.tag.mark').hidden=!on;
+  markBtn.disabled=i===undefined;
+  markBtn.setAttribute('aria-pressed',on);
+  markBtn.textContent=on?'★ Marked for review':'☆ Mark for review';
+  // Count only marks that match a slide, so stale keys from an older deck don't inflate the number
+  revBtn.textContent=`Review only (${S.filter((s,j)=>marks.has(keyOf(j))).length})`;
+}
+function toggleMark(){
+  if(!order.length)return;
+  const k=keyOf(order[pos]);
+  if(marks.has(k))marks.delete(k);else marks.add(k);
+  try{localStorage.setItem(MARKS_KEY,JSON.stringify([...marks]))}catch(e){}
+  // In review mode an unmarked card must leave the pile, so re-filter instead of repainting
+  if(reviewOnly)rebuild(cur);else show();
+}
+function show(){
+  els.forEach(e=>e.hidden=true);
+  emptyEl.hidden=order.length>0;
+  if(!order.length){
+    document.getElementById('count').textContent='0 / 0';
+    document.getElementById('bar').style.width='0';
+    paintMarks();return;
+  }
+  const i=cur=order[pos];els[i].hidden=false;stage.scrollTop=0;
+  paintMarks(i);
+  document.getElementById('count').textContent=`${pos+1} / ${order.length}`;
+  document.getElementById('bar').style.width=((pos+1)/order.length*100)+'%';
+  secSel.value=S[i][0];
+  try{localStorage.setItem('m54deck5',String(i))}catch(e){}
+}
+function go(d){if(!order.length)return;pos=Math.min(order.length-1,Math.max(0,pos+d));show()}
+document.getElementById('prev').onclick=()=>go(-1);
+document.getElementById('next').onclick=()=>go(1);
+secSel.onchange=()=>{pos=order.findIndex(i=>S[i][0]===secSel.value);show()};
+[['f-all','all'],['f-thm',T],['f-fact',F]].forEach(([id,f])=>{
+  document.getElementById(id).onclick=()=>{filter=f;document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.id===id));rebuild(cur)};
+});
+markBtn.onclick=toggleMark;
+revBtn.onclick=()=>{reviewOnly=!reviewOnly;revBtn.setAttribute('aria-pressed',reviewOnly);rebuild(cur)};
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT')return;
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
+  else if(e.key.toLowerCase()===MARK_SHORTCUT&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();toggleMark()}
+  else if(e.key==='Home'){pos=0;show()}else if(e.key==='End'){pos=order.length-1;show()}
+});
+stage.addEventListener('click',e=>{
+  if(window.getSelection&&String(window.getSelection()).length)return;
+  const r=stage.getBoundingClientRect();const x=(e.clientX-r.left)/r.width;
+  if(x<0.3)go(-1);else if(x>0.7)go(1);
+});
+let tx=null,ty=null;
+stage.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){go(dx<0?1:-1);e.preventDefault()}tx=null},{passive:false});
+let start=0;try{const v=parseInt(localStorage.getItem('m54deck5'),10);if(v>=0&&v<S.length)start=v}catch(e){}
+rebuild(start);
+function typeset(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([stage]).catch(()=>{})}
+if(window.MathJax&&MathJax.startup&&MathJax.startup.promise)MathJax.startup.promise.then(typeset);else window.addEventListener('load',typeset);
+</script>
