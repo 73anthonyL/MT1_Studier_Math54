@@ -1,0 +1,480 @@
+<title>Math 54 Orthogonality Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: one long study sheet, a sticky section strip on top, each lesson = idea → boxes → method → example → traps → self-check */
+:root{
+  --bg:#f3f4f7; --fg:#1d1f27; --muted:#626779; --line:#d8dbe4; --panel:#ffffff;
+  --thm:#6a3fb5; --thm-fill:#f3eefc; --thm-edge:#b9a2e6;
+  --fact:#23805a; --fact-fill:#ebf6ef; --fact-edge:#99cfb3;
+  --warn:#9a5b00; --warn-fill:#fff3dc; --warn-edge:#e7c27f;
+  --ok:#23805a; --bad:#b3261e;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --label:"IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15161c; --fg:#e7e8ee; --muted:#9a9eb0; --line:#2c2f3b; --panel:#1d1f27;
+  --thm:#c3a6ff; --thm-fill:#231c36; --thm-edge:#5b4390;
+  --fact:#7fd8ae; --fact-fill:#152a21; --fact-edge:#2f6b50;
+  --warn:#ffc46b; --warn-fill:#33270f; --warn-edge:#6b5220;
+  --ok:#7fd8ae; --bad:#ff9f96; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15161c; --fg:#e7e8ee; --muted:#9a9eb0; --line:#2c2f3b; --panel:#1d1f27;
+  --thm:#c3a6ff; --thm-fill:#231c36; --thm-edge:#5b4390;
+  --fact:#7fd8ae; --fact-fill:#152a21; --fact-edge:#2f6b50;
+  --warn:#ffc46b; --warn-fill:#33270f; --warn-edge:#6b5220;
+  --ok:#7fd8ae; --bad:#ff9f96; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--serif);font-size:18px;line-height:1.6;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:780px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.skip{position:absolute;left:-999px}.skip:focus{left:16px;top:8px;z-index:20;background:var(--panel);padding:6px 10px}
+nav.strip{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);font-family:var(--label)}
+nav.strip .in{max-width:780px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
+nav.strip a{color:var(--fg);text-decoration:none;font-size:15px;padding:3px 8px;border-radius:6px;border:1px solid transparent}
+nav.strip a[aria-current="true"]{border-color:var(--line);background:var(--panel)}
+nav.strip a .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:6px;vertical-align:middle;border:1.5px solid var(--muted)}
+nav.strip a .dot.on{background:var(--ok);border-color:var(--ok)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--thm);outline-offset:2px}
+header.intro{padding-block:36px 8px}
+header.intro h1{font-size:clamp(30px,5vw,42px);line-height:1.15;margin:0 0 12px;text-wrap:balance;font-weight:600}
+header.intro p{margin:0 0 10px;color:var(--muted);max-width:62ch}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:22px 0 0;padding:0;list-style:none;font-family:var(--label)}
+.map li{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:14px;line-height:1.4;color:var(--muted)}
+.map b{display:block;color:var(--fg);font-size:15px;margin-bottom:2px}
+section.lesson{padding-top:44px;scroll-margin-top:60px}
+.eyebrow{font-family:var(--label);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+h2{font-size:clamp(25px,4vw,32px);line-height:1.2;margin:0 0 14px;text-wrap:balance;font-weight:600}
+h3{font-family:var(--label);font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:30px 0 10px}
+.lede{font-size:20px;line-height:1.55;margin:0 0 6px;max-width:62ch}
+.stack{display:grid;gap:12px}
+.box{border:1.5px solid var(--edge);background:var(--fill);border-radius:4px;padding:16px 20px;box-shadow:inset 5px 0 0 var(--ink);min-width:0}
+.box.thm{--edge:var(--thm-edge);--fill:var(--thm-fill);--ink:var(--thm)}
+.box.fact{--edge:var(--fact-edge);--fill:var(--fact-fill);--ink:var(--fact)}
+.box.warn{--edge:var(--warn-edge);--fill:var(--warn-fill);--ink:var(--warn)}
+.box h4{font-family:var(--label);font-weight:600;font-size:14px;letter-spacing:.04em;color:var(--ink);margin:0 0 6px}
+.box p{margin:0 0 .5em}.box p:last-child{margin-bottom:0}
+.box ol,.box ul{margin:.2em 0 .3em;padding-left:1.4em}
+ol.alpha{list-style:lower-alpha}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:10px;min-width:0}
+ol.steps>li::before{content:counter(s);font-family:var(--label);font-weight:600;font-size:14px;width:26px;height:26px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;margin-top:3px}
+ol.steps>li>div{min-width:0}
+ul.traps{margin:0;padding-left:1.2em}
+ul.traps li{margin:0 0 .45em}
+details{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:0 16px;min-width:0}
+details+details{margin-top:10px}
+summary{cursor:pointer;padding:12px 0;font-weight:600;list-style-position:outside}
+summary .k{font-family:var(--label);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--thm);margin-right:8px}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:12px}
+details>div{padding-bottom:14px}
+.check{display:flex;align-items:center;gap:10px;margin-top:22px;font-family:var(--label);font-size:15px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+.check input{width:20px;height:20px;accent-color:var(--ok)}
+table.sheet{border-collapse:collapse;width:100%;min-width:560px;font-size:16px}
+.tscroll{overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+table.sheet th,table.sheet td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+table.sheet th{font-family:var(--label);font-weight:600;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+table.sheet tr:last-child td{border-bottom:0}
+.quiz{display:grid;gap:12px;counter-reset:q}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;counter-increment:q;min-width:0}
+.q p{margin:0 0 10px}
+.q p::before{content:counter(q) ". ";font-family:var(--label);font-weight:600;color:var(--muted)}
+.q .btns{display:flex;gap:8px;flex-wrap:wrap}
+.q button{font-family:var(--label);font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 16px;cursor:pointer}
+.q button[aria-pressed="true"].right{background:var(--fact-fill);border-color:var(--ok);color:var(--ok)}
+.q button[aria-pressed="true"].wrong{background:var(--warn-fill);border-color:var(--bad);color:var(--bad)}
+.q .why{margin:10px 0 0;font-size:16px;color:var(--muted)}
+.score{font-family:var(--label);font-size:15px;color:var(--muted);display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.score button{font-family:var(--label);font-size:14px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 12px;cursor:pointer}
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:2px 0}
+footer{margin-top:48px;font-family:var(--label);font-size:13px;color:var(--muted)}
+@media (max-width:520px){body{font-size:17px}.box{padding:14px 14px}nav.strip a{font-size:14px;padding:3px 6px}.brand{width:100%}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+<a class="skip" href="#s55">Skip to §5.5</a>
+<nav class="strip" aria-label="Sections">
+  <div class="in">
+    <span class="brand">Math 54 · §5.5–6.3 guide</span>
+    <a href="#s55" data-sec="s55">5.5<span class="dot" aria-hidden="true"></span></a>
+    <a href="#s61" data-sec="s61">6.1<span class="dot" aria-hidden="true"></span></a>
+    <a href="#s62" data-sec="s62">6.2<span class="dot" aria-hidden="true"></span></a>
+    <a href="#s63" data-sec="s63">6.3<span class="dot" aria-hidden="true"></span></a>
+    <a href="#sheet" data-sec="sheet">Sheet</a>
+    <a href="#quiz" data-sec="quiz">Quiz</a>
+  </div>
+</nav>
+
+<main class="wrap">
+<header class="intro">
+  <h1>Complex eigenvalues to orthogonal projections</h1>
+  <p>This guide covers Lay §5.5–6.3 in the Berkeley custom edition (book pp. 304–372). Each lesson goes through the main idea, the textbook boxes, a method you can follow step by step, one worked example from the book, common traps, and self-check problems with hidden answers.</p>
+  <p>Tick “I can do this” at the end of a lesson to put a dot in the top bar. Your ticks and quiz answers stay in this browser only.</p>
+  <ol class="map">
+    <li><b>5.5 Complex eigenvalues</b>A real matrix with no real eigenvalues is a rotation and scaling in disguise.</li>
+    <li><b>6.1 Inner product</b>The dot product gives length, distance, perpendicularity and $W^\perp$.</li>
+    <li><b>6.2 Orthogonal sets</b>With an orthogonal basis, the weights are dot products and you don't have to row reduce.</li>
+    <li><b>6.3 Projections</b>$\hat{\mathbf y}=\operatorname{proj}_W\mathbf y$ is the closest point in $W$, and $\mathbf y-\hat{\mathbf y}\perp W$.</li>
+  </ol>
+</header>
+
+<!-- ───────────────────────── 5.5 ───────────────────────── -->
+<section class="lesson" id="s55" aria-labelledby="h55">
+  <p class="eyebrow">§5.5 · pp. 304–309</p>
+  <h2 id="h55">Complex Eigenvalues</h2>
+  <p class="lede">The characteristic polynomial of a real matrix can have complex roots. For a 2×2 matrix with real entries, complex roots mean no real direction stays on its own line. In a suitable basis, the matrix just <em>rotates and scales</em>.</p>
+
+  <h3>The boxes</h3>
+  <div class="stack">
+    <div class="box fact"><h4>Definition: complex eigenvalue and eigenvector</h4>
+      <p>A complex scalar $\lambda$ is an eigenvalue of $A$ if and only if $\det(A-\lambda I)=0$, that is, there is a nonzero $\mathbf x\in\mathbb C^n$ with $A\mathbf x=\lambda\mathbf x$. Then $\mathbf x$ is a (complex) eigenvector.</p></div>
+    <div class="box fact"><h4>Real and imaginary parts</h4>
+      <p>Every $\mathbf x\in\mathbb C^n$ splits as $\mathbf x=\operatorname{Re}\mathbf x+i\operatorname{Im}\mathbf x$, where $\operatorname{Re}\mathbf x$ and $\operatorname{Im}\mathbf x$ are in $\mathbb R^n$. Conjugation passes through products: $\overline{r\mathbf x}=\bar r\,\bar{\mathbf x}$, $\overline{B\mathbf x}=\bar B\,\bar{\mathbf x}$, $\overline{BC}=\bar B\,\bar C$.</p></div>
+    <div class="box fact"><h4>Conjugate pairs (when $A$ is real)</h4>
+      <p>If $A$ is real and $A\mathbf x=\lambda\mathbf x$, then $A\bar{\mathbf x}=\overline{A\mathbf x}=\bar\lambda\bar{\mathbf x}$. So complex eigenvalues come in pairs $a\pm bi$, and their eigenvectors are conjugates of each other.</p></div>
+    <div class="box fact"><h4>The building block (Example 6)</h4>
+      <p>If $C=\begin{bmatrix}a&-b\\ b&a\end{bmatrix}$ with $a,b$ real and not both zero, then $\lambda=a\pm bi$, and with $r=|\lambda|=\sqrt{a^2+b^2}$,
+      $$C=r\begin{bmatrix}\cos\varphi&-\sin\varphi\\ \sin\varphi&\cos\varphi\end{bmatrix},$$
+      so $C$ rotates by the angle $\varphi$ (the argument of $a+bi$) and then scales by $r$.</p></div>
+    <div class="box thm"><h4>Theorem 9</h4>
+      <p>Let $A$ be a real $2\times2$ matrix with a complex eigenvalue $\lambda=a-bi$ ($b\ne0$) and an associated eigenvector $\mathbf v\in\mathbb C^2$. Then
+      $$A=PCP^{-1},\quad P=\begin{bmatrix}\operatorname{Re}\mathbf v&\operatorname{Im}\mathbf v\end{bmatrix},\quad C=\begin{bmatrix}a&-b\\ b&a\end{bmatrix}.$$</p></div>
+  </div>
+
+  <h3>Method: find the rotation hidden in $A$</h3>
+  <ol class="steps">
+    <li><div>Solve $\lambda^2-(\operatorname{tr}A)\lambda+\det A=0$. A negative discriminant gives $\lambda=a\pm bi$.</div></li>
+    <li><div>Take the root with the <strong>minus</strong> sign, $\lambda=a-bi$. This is the one Theorem 9 uses.</div></li>
+    <li><div>Find an eigenvector from <em>one</em> row of $A-\lambda I$. You can skip row reduction because the two rows are complex multiples of each other. If a row reads $[\,p\ \ q\,]$, then $\mathbf v=\begin{bmatrix}-q\\ p\end{bmatrix}$ works.</div></li>
+    <li><div>Set $P=[\operatorname{Re}\mathbf v\ \ \operatorname{Im}\mathbf v]$ and $C=\begin{bmatrix}a&-b\\ b&a\end{bmatrix}$. Check $AP=PC$, which avoids computing $P^{-1}$.</div></li>
+    <li><div>Read off the long-run behavior from $r=|\lambda|$: $r&lt;1$ spirals in, $r=1$ stays on an ellipse, and $r&gt;1$ spirals out.</div></li>
+  </ol>
+
+  <h3>Worked example (Examples 2 and 7)</h3>
+  <details><summary><span class="k">Example</span>$A=\begin{bmatrix}.5&-.6\\ .75&1.1\end{bmatrix}$</summary><div>
+    <p>$\det(A-\lambda I)=\lambda^2-1.6\lambda+1=0$, so $\lambda=.8\pm.6i$. Take $\lambda=.8-.6i$:
+    $$A-\lambda I=\begin{bmatrix}-.3+.6i&-.6\\ .75&.3+.6i\end{bmatrix}.$$
+    Row 2 gives $.75x_1=(-.3-.6i)x_2$. With $x_2=5$ this gives $\mathbf v_1=\begin{bmatrix}-2-4i\\5\end{bmatrix}$, so
+    $$P=\begin{bmatrix}-2&-4\\5&0\end{bmatrix},\qquad C=P^{-1}AP=\begin{bmatrix}.8&-.6\\ .6&.8\end{bmatrix}.$$
+    Since $|\lambda|^2=.64+.36=1$, $C$ is a pure rotation. Points $\mathbf x_k=A^k\mathbf x_0$ go around an <em>ellipse</em> rather than a circle, because the axes given by $P$'s columns are not perpendicular and have different lengths (Figure 1, p. 306).</p>
+  </div></details>
+
+  <h3>Traps</h3>
+  <ul class="traps">
+    <li><strong>Sign mismatch.</strong> Theorem 9 pairs $\lambda=a-bi$ with $C=\begin{bmatrix}a&-b\\ b&a\end{bmatrix}$. If you use $a+bi$ with the same $P$ recipe, $AP=PC$ fails.</li>
+    <li><strong>Column order.</strong> $P$ is $[\operatorname{Re}\mathbf v\ \ \operatorname{Im}\mathbf v]$, with the real part first.</li>
+    <li><strong>"No real eigenvalues" ≠ "no eigenvalues."</strong> Over $\mathbb C$, an $n\times n$ matrix always has $n$ eigenvalues counting multiplicity.</li>
+    <li><strong>Odd size.</strong> A real $3\times3$ matrix always has at least one real eigenvalue, because complex roots come in pairs. Example 8 has $.8\pm.6i$ and $1.07$.</li>
+    <li>$r=|\lambda|$ is $\sqrt{a^2+b^2}$, not $a$.</li>
+  </ul>
+
+  <h3>Self-check</h3>
+  <details><summary><span class="k">Try</span>Find $P$ and $C$ for $A=\begin{bmatrix}1&-2\\1&3\end{bmatrix}$. Does $A^k\mathbf x$ spiral in or out?</summary><div>
+    <p>$\lambda^2-4\lambda+5=0\Rightarrow\lambda=2\pm i$. For $\lambda=2-i$, row 2 of $A-\lambda I$ is $[\,1\ \ 1+i\,]$, so $\mathbf v=\begin{bmatrix}-1-i\\1\end{bmatrix}$.
+    $$P=\begin{bmatrix}-1&-1\\1&0\end{bmatrix},\quad C=\begin{bmatrix}2&-1\\1&2\end{bmatrix}.$$
+    Check the first column: $A\begin{bmatrix}-1\\1\end{bmatrix}=\begin{bmatrix}-3\\2\end{bmatrix}=P\begin{bmatrix}2\\1\end{bmatrix}$. Since $r=\sqrt5&gt;1$, it spirals <strong>out</strong>.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>Show the eigenvalues of $\begin{bmatrix}a&-b\\b&a\end{bmatrix}$ are $a\pm bi$ with eigenvectors $\begin{bmatrix}1\\-i\end{bmatrix}$ and $\begin{bmatrix}1\\i\end{bmatrix}$. (Practice Problem, p. 309)</summary><div>
+    <p>$\begin{bmatrix}a&-b\\b&a\end{bmatrix}\begin{bmatrix}1\\-i\end{bmatrix}=\begin{bmatrix}a+bi\\b-ai\end{bmatrix}=(a+bi)\begin{bmatrix}1\\-i\end{bmatrix}$, because $(a+bi)(-i)=b-ai$. The other eigenpair is its conjugate.</p>
+  </div></details>
+
+  <label class="check"><input type="checkbox" data-done="s55"> I can do this: find $\lambda$, $P$ and $C$, and describe the motion.</label>
+</section>
+
+<!-- ───────────────────────── 6.1 ───────────────────────── -->
+<section class="lesson" id="s61" aria-labelledby="h61">
+  <p class="eyebrow">§6.1 · pp. 350–356</p>
+  <h2 id="h61">Inner Product, Length, and Orthogonality</h2>
+  <p class="lede">Length, distance, angle and perpendicularity in $\mathbb R^n$ all come from the dot product $\mathbf u\cdot\mathbf v=\mathbf u^T\mathbf v$. The idea that leads into the rest of the chapter is the <em>orthogonal complement</em> $W^\perp$.</p>
+
+  <h3>The boxes</h3>
+  <div class="stack">
+    <div class="box fact"><h4>Inner product</h4>
+      <p>$\mathbf u\cdot\mathbf v=\mathbf u^T\mathbf v=u_1v_1+\cdots+u_nv_n$. The result is a <em>scalar</em>.</p></div>
+    <div class="box thm"><h4>Theorem 1</h4>
+      <p>For $\mathbf u,\mathbf v,\mathbf w\in\mathbb R^n$ and scalar $c$:</p>
+      <ol class="alpha"><li>$\mathbf u\cdot\mathbf v=\mathbf v\cdot\mathbf u$</li><li>$(\mathbf u+\mathbf v)\cdot\mathbf w=\mathbf u\cdot\mathbf w+\mathbf v\cdot\mathbf w$</li><li>$(c\mathbf u)\cdot\mathbf v=c(\mathbf u\cdot\mathbf v)=\mathbf u\cdot(c\mathbf v)$</li><li>$\mathbf u\cdot\mathbf u\ge0$, and $\mathbf u\cdot\mathbf u=0$ iff $\mathbf u=\mathbf 0$</li></ol></div>
+    <div class="box fact"><h4>Length, unit vectors, distance</h4>
+      <p>$\|\mathbf v\|=\sqrt{\mathbf v\cdot\mathbf v}$, so $\|\mathbf v\|^2=\mathbf v\cdot\mathbf v$. Also $\|c\mathbf v\|=|c|\,\|\mathbf v\|$. <strong>Normalizing</strong> means $\mathbf u=\mathbf v/\|\mathbf v\|$, a unit vector pointing the same way as $\mathbf v$. $\operatorname{dist}(\mathbf u,\mathbf v)=\|\mathbf u-\mathbf v\|$.</p></div>
+    <div class="box fact"><h4>Definition: orthogonal</h4>
+      <p>$\mathbf u$ and $\mathbf v$ are orthogonal if $\mathbf u\cdot\mathbf v=0$. The zero vector is orthogonal to every vector.</p></div>
+    <div class="box thm"><h4>Theorem 2 · The Pythagorean Theorem</h4>
+      <p>$\mathbf u$ and $\mathbf v$ are orthogonal if and only if $\|\mathbf u+\mathbf v\|^2=\|\mathbf u\|^2+\|\mathbf v\|^2$.</p></div>
+    <div class="box fact"><h4>Orthogonal complement $W^\perp$</h4>
+      <p>$W^\perp$ is the set of all $\mathbf z$ orthogonal to every vector in $W$.</p>
+      <ol><li>$\mathbf x\in W^\perp$ iff $\mathbf x$ is orthogonal to every vector in a <em>spanning set</em> of $W$.</li><li>$W^\perp$ is a subspace of $\mathbb R^n$.</li></ol></div>
+    <div class="box thm"><h4>Theorem 3</h4>
+      <p>For an $m\times n$ matrix $A$: $\;(\operatorname{Row}A)^\perp=\operatorname{Nul}A\;$ and $\;(\operatorname{Col}A)^\perp=\operatorname{Nul}A^T$.</p></div>
+    <div class="box fact"><h4>Angles (optional)</h4>
+      <p>$\mathbf u\cdot\mathbf v=\|\mathbf u\|\,\|\mathbf v\|\cos\vartheta$.</p></div>
+  </div>
+
+  <h3>Method: compute $W^\perp$</h3>
+  <ol class="steps">
+    <li><div>Write a spanning set of $W$ as the <strong>rows</strong> of a matrix $A$.</div></li>
+    <li><div>By Theorem 3, $W^\perp=(\operatorname{Row}A)^\perp=\operatorname{Nul}A$. Row reduce $A$ and solve $A\mathbf x=\mathbf 0$.</div></li>
+    <li><div>Check the dimensions: $\dim W+\dim W^\perp=n$ (Practice Problem 3 from the rank theorem).</div></li>
+  </ol>
+
+  <h3>Worked examples (Examples 2 and 4)</h3>
+  <details><summary><span class="k">Example</span>Normalize $\mathbf v=(1,-2,2,0)$, and find $\operatorname{dist}\big((7,1),(3,2)\big)$.</summary><div>
+    <p>$\|\mathbf v\|^2=1+4+4+0=9$, so $\mathbf u=\tfrac13\mathbf v=(\tfrac13,-\tfrac23,\tfrac23,0)$. To check, $\|\mathbf u\|^2=\tfrac19+\tfrac49+\tfrac49=1$.</p>
+    <p>$\mathbf u-\mathbf v=(4,-1)$, so the distance is $\sqrt{16+1}=\sqrt{17}$.</p>
+  </div></details>
+
+  <h3>Traps</h3>
+  <ul class="traps">
+    <li>$\|\mathbf u+\mathbf v\|=\|\mathbf u\|+\|\mathbf v\|$ is <strong>false</strong> in general. It is the <em>squares</em> that add, and only when $\mathbf u\perp\mathbf v$.</li>
+    <li>$(\operatorname{Col}A)^\perp$ is $\operatorname{Nul}A^{T}$, <em>not</em> $\operatorname{Nul}A$. The two spaces don't even sit in the same $\mathbb R^k$ unless $m=n$.</li>
+    <li>When you test $\mathbf x\in W^\perp$, a spanning set is enough. You do not have to check every vector in $W$.</li>
+    <li>Scaling a vector before normalizing doesn't change the unit vector. Clear fractions first, as in Example 3.</li>
+  </ul>
+
+  <h3>Self-check</h3>
+  <details><summary><span class="k">Try</span>Find a basis for $W^\perp$ where $W=\operatorname{Span}\{(1,1,1)\}\subset\mathbb R^3$.</summary><div>
+    <p>$W^\perp=\operatorname{Nul}[\,1\ 1\ 1\,]$, which is the plane $x_1+x_2+x_3=0$. A basis is $\{(-1,1,0),(-1,0,1)\}$. The dimensions check: $1+2=3$.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>Let $\mathbf a=(-2,1)$, $\mathbf b=(-3,1)$. Compute $\frac{\mathbf a\cdot\mathbf b}{\mathbf a\cdot\mathbf a}\mathbf a$. (Practice Problem 1)</summary><div>
+    <p>$\mathbf a\cdot\mathbf b=7$ and $\mathbf a\cdot\mathbf a=5$, so the answer is $\tfrac75\mathbf a=(-\tfrac{14}5,\tfrac75)$. This quantity is the projection of $\mathbf b$ onto $\mathbf a$, which returns in 6.2.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>True or false: if $\mathbf x$ is orthogonal to every row of $A$, then $A\mathbf x=\mathbf 0$.</summary><div>
+    <p>True. Each entry of $A\mathbf x$ is a row of $A$ dotted with $\mathbf x$. This is the proof of Theorem 3.</p>
+  </div></details>
+
+  <label class="check"><input type="checkbox" data-done="s61"> I can do this: compute lengths and distances, test orthogonality, and find $W^\perp$.</label>
+</section>
+
+<!-- ───────────────────────── 6.2 ───────────────────────── -->
+<section class="lesson" id="s62" aria-labelledby="h62">
+  <p class="eyebrow">§6.2 · pp. 358–364</p>
+  <h2 id="h62">Orthogonal Sets</h2>
+  <p class="lede">With a basis whose vectors are mutually perpendicular, you never need to row reduce to find coordinates: <em>each weight is one dot product divided by another</em>. Normalize the vectors as well and you get matrices with $U^TU=I$, which preserve lengths and angles.</p>
+
+  <h3>The boxes</h3>
+  <div class="stack">
+    <div class="box fact"><h4>Definition: orthogonal set</h4>
+      <p>$\{\mathbf u_1,\dots,\mathbf u_p\}$ is an orthogonal set if $\mathbf u_i\cdot\mathbf u_j=0$ whenever $i\ne j$.</p></div>
+    <div class="box thm"><h4>Theorem 4</h4>
+      <p>An orthogonal set $S$ of <strong>nonzero</strong> vectors in $\mathbb R^n$ is linearly independent, and so is a basis for $\operatorname{Span}S$.</p></div>
+    <div class="box fact"><h4>Definition: orthogonal basis</h4>
+      <p>An orthogonal basis for $W$ is a basis for $W$ that is also an orthogonal set.</p></div>
+    <div class="box thm"><h4>Theorem 5</h4>
+      <p>If $\{\mathbf u_1,\dots,\mathbf u_p\}$ is an orthogonal basis for $W$, then each $\mathbf y\in W$ satisfies $\mathbf y=c_1\mathbf u_1+\cdots+c_p\mathbf u_p$ with
+      $$c_j=\frac{\mathbf y\cdot\mathbf u_j}{\mathbf u_j\cdot\mathbf u_j}.$$</p></div>
+    <div class="box fact"><h4>Projection onto a line</h4>
+      <p>For $\mathbf u\ne\mathbf 0$ and $L=\operatorname{Span}\{\mathbf u\}$:
+      $$\hat{\mathbf y}=\operatorname{proj}_L\mathbf y=\frac{\mathbf y\cdot\mathbf u}{\mathbf u\cdot\mathbf u}\,\mathbf u,\qquad \mathbf z=\mathbf y-\hat{\mathbf y}\ \perp\ \mathbf u.$$
+      $\hat{\mathbf y}$ depends only on $L$, not on which $\mathbf u$ spans it. The distance from $\mathbf y$ to $L$ is $\|\mathbf y-\hat{\mathbf y}\|$.</p></div>
+    <div class="box fact"><h4>Orthonormal sets</h4>
+      <p>An orthonormal set is an orthogonal set of unit vectors. An orthonormal basis for $W$ is a basis that is an orthonormal set.</p></div>
+    <div class="box thm"><h4>Theorem 6</h4>
+      <p>An $m\times n$ matrix $U$ has orthonormal columns if and only if $U^TU=I$.</p></div>
+    <div class="box thm"><h4>Theorem 7</h4>
+      <p>If $U$ ($m\times n$) has orthonormal columns and $\mathbf x,\mathbf y\in\mathbb R^n$:</p>
+      <ol class="alpha"><li>$\|U\mathbf x\|=\|\mathbf x\|$</li><li>$(U\mathbf x)\cdot(U\mathbf y)=\mathbf x\cdot\mathbf y$</li><li>$(U\mathbf x)\cdot(U\mathbf y)=0$ iff $\mathbf x\cdot\mathbf y=0$</li></ol></div>
+    <div class="box fact"><h4>Orthogonal matrix</h4>
+      <p>An orthogonal matrix is a <strong>square</strong> invertible $U$ with $U^{-1}=U^T$. Its columns are orthonormal, and so are its rows. Also $\det U=\pm1$ (Practice Problem 4).</p></div>
+  </div>
+
+  <h3>Method: coordinates in an orthogonal basis</h3>
+  <ol class="steps">
+    <li><div>Check every pair: $\mathbf u_i\cdot\mathbf u_j=0$. If any pair fails, Theorem 5 does not apply.</div></li>
+    <li><div>For each $j$, compute $\mathbf y\cdot\mathbf u_j$ and $\mathbf u_j\cdot\mathbf u_j$.</div></li>
+    <li><div>Divide to get $c_j$, then check by recombining.</div></li>
+  </ol>
+
+  <h3>Worked examples (Examples 2 and 3)</h3>
+  <details><summary><span class="k">Example</span>Write $\mathbf y=(6,1,-8)$ in the basis $\mathbf u_1=(3,1,1)$, $\mathbf u_2=(-1,2,1)$, $\mathbf u_3=(-\tfrac12,-2,\tfrac72)$.</summary><div>
+    <p>$\mathbf y\cdot\mathbf u_1=11,\ \mathbf u_1\cdot\mathbf u_1=11$; $\ \mathbf y\cdot\mathbf u_2=-12,\ \mathbf u_2\cdot\mathbf u_2=6$; $\ \mathbf y\cdot\mathbf u_3=-33,\ \mathbf u_3\cdot\mathbf u_3=\tfrac{33}2$.
+    $$\mathbf y=\tfrac{11}{11}\mathbf u_1+\tfrac{-12}{6}\mathbf u_2+\tfrac{-33}{33/2}\mathbf u_3=\mathbf u_1-2\mathbf u_2-2\mathbf u_3.$$</p>
+  </div></details>
+  <details><summary><span class="k">Example</span>Project $\mathbf y=(7,6)$ onto $\mathbf u=(4,2)$, and find the distance from $\mathbf y$ to $L$.</summary><div>
+    <p>$\hat{\mathbf y}=\tfrac{40}{20}\mathbf u=(8,4)$ and $\mathbf z=\mathbf y-\hat{\mathbf y}=(-1,2)$. Check: $\hat{\mathbf y}\cdot\mathbf z=-8+8=0$. The distance is $\|\mathbf z\|=\sqrt5$.</p>
+  </div></details>
+
+  <h3>Traps</h3>
+  <ul class="traps">
+    <li>Theorem 4 needs <strong>nonzero</strong> vectors. Adding $\mathbf 0$ keeps a set orthogonal but makes it dependent.</li>
+    <li>Theorem 5 gives correct weights only if $\mathbf y$ is <em>in</em> $W$. If it isn't, the same formula gives the projection (§6.3).</li>
+    <li>If $U$ has orthonormal columns but is <strong>not square</strong>, then $U^TU=I$ while $UU^T\ne I$. That case is not called an “orthogonal matrix.”</li>
+    <li>The term is <em>orthogonal</em> matrix, yet its columns must be ortho<strong>normal</strong>. Merely orthogonal columns are not enough.</li>
+  </ul>
+
+  <h3>Self-check</h3>
+  <details><summary><span class="k">Try</span>Show $\mathbf u_1=(2,-3)$, $\mathbf u_2=(6,4)$ is an orthogonal basis of $\mathbb R^2$, then write $\mathbf x=(9,-7)$ in it. (Exercise 7)</summary><div>
+    <p>$\mathbf u_1\cdot\mathbf u_2=12-12=0$, and both vectors are nonzero, so by Theorem 4 they form a basis. $c_1=\tfrac{18+21}{13}=3$ and $c_2=\tfrac{54-28}{52}=\tfrac12$, so $\mathbf x=3\mathbf u_1+\tfrac12\mathbf u_2$. Check: $(6,-9)+(3,2)=(9,-7)$.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>Redo the projection of $\mathbf y=(7,6)$ using $\mathbf u=(2,1)$ instead. (Practice Problem 2)</summary><div>
+    <p>$\tfrac{20}{5}(2,1)=(8,4)$, the same answer as before, because the projection depends only on the line $L$.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>Why does $\det U=\pm1$ for a square $U$ with orthonormal columns?</summary><div>
+    <p>$U^TU=I\Rightarrow\det(U^T)\det U=(\det U)^2=1$.</p>
+  </div></details>
+
+  <label class="check"><input type="checkbox" data-done="s62"> I can do this: find weights by dot products, project onto a line, and use $U^TU=I$.</label>
+</section>
+
+<!-- ───────────────────────── 6.3 ───────────────────────── -->
+<section class="lesson" id="s63" aria-labelledby="h63">
+  <p class="eyebrow">§6.3 · pp. 367–372</p>
+  <h2 id="h63">Orthogonal Projections</h2>
+  <p class="lede">Projection onto a line extends to projection onto any subspace $W$. Every $\mathbf y$ splits <em>uniquely</em> into a part in $W$ and a part perpendicular to $W$, and the part in $W$ is the closest point of $W$ to $\mathbf y$. Least squares (§6.5) depends on this.</p>
+
+  <h3>The boxes</h3>
+  <div class="stack">
+    <div class="box thm"><h4>Theorem 8 · The Orthogonal Decomposition Theorem</h4>
+      <p>Let $W$ be a subspace of $\mathbb R^n$. Each $\mathbf y\in\mathbb R^n$ can be written uniquely as $\mathbf y=\hat{\mathbf y}+\mathbf z$ with $\hat{\mathbf y}\in W$ and $\mathbf z\in W^\perp$. If $\{\mathbf u_1,\dots,\mathbf u_p\}$ is <strong>any orthogonal basis</strong> of $W$,
+      $$\hat{\mathbf y}=\frac{\mathbf y\cdot\mathbf u_1}{\mathbf u_1\cdot\mathbf u_1}\mathbf u_1+\cdots+\frac{\mathbf y\cdot\mathbf u_p}{\mathbf u_p\cdot\mathbf u_p}\mathbf u_p,\qquad \mathbf z=\mathbf y-\hat{\mathbf y}.$$
+      $\hat{\mathbf y}=\operatorname{proj}_W\mathbf y$ does not depend on which orthogonal basis you use.</p></div>
+    <div class="box fact"><h4>Property</h4>
+      <p>If $\mathbf y\in W=\operatorname{Span}\{\mathbf u_1,\dots,\mathbf u_p\}$, then $\operatorname{proj}_W\mathbf y=\mathbf y$.</p></div>
+    <div class="box thm"><h4>Theorem 9 · The Best Approximation Theorem</h4>
+      <p>$\hat{\mathbf y}=\operatorname{proj}_W\mathbf y$ is the closest point in $W$ to $\mathbf y$:
+      $$\|\mathbf y-\hat{\mathbf y}\|&lt;\|\mathbf y-\mathbf v\|\quad\text{for all }\mathbf v\in W,\ \mathbf v\ne\hat{\mathbf y}.$$
+      So the distance from $\mathbf y$ to $W$ is $\|\mathbf y-\hat{\mathbf y}\|$.</p></div>
+    <div class="box thm"><h4>Theorem 10</h4>
+      <p>If $\{\mathbf u_1,\dots,\mathbf u_p\}$ is an <strong>orthonormal</strong> basis for $W$ and $U=[\mathbf u_1\ \cdots\ \mathbf u_p]$, then
+      $$\operatorname{proj}_W\mathbf y=(\mathbf y\cdot\mathbf u_1)\mathbf u_1+\cdots+(\mathbf y\cdot\mathbf u_p)\mathbf u_p=UU^T\mathbf y.$$</p></div>
+    <div class="box fact"><h4>The two products</h4>
+      <p>$U^TU\mathbf x=I_p\mathbf x=\mathbf x$ (Theorem 6), and $UU^T\mathbf y=\operatorname{proj}_W\mathbf y$ (Theorem 10). If $U$ is square, $W=\mathbb R^n$ and $UU^T=I$ as well.</p></div>
+  </div>
+
+  <h3>Method: decompose $\mathbf y$ and find its distance to $W$</h3>
+  <ol class="steps">
+    <li><div><strong>First check the basis is orthogonal.</strong> If it is not, the formula gives a wrong answer, and you have to orthogonalize first (Gram–Schmidt, §6.4).</div></li>
+    <li><div>Compute $\hat{\mathbf y}$ term by term. Each term is the projection onto one line $\operatorname{Span}\{\mathbf u_j\}$ (Figure 3, p. 369).</div></li>
+    <li><div>Set $\mathbf z=\mathbf y-\hat{\mathbf y}$, then check $\mathbf z\cdot\mathbf u_j=0$ for each $j$.</div></li>
+    <li><div>The distance from $\mathbf y$ to $W$ is $\|\mathbf z\|$.</div></li>
+  </ol>
+
+  <h3>Worked examples (Examples 2 and 4)</h3>
+  <details><summary><span class="k">Example</span>$\mathbf u_1=(2,5,-1)$, $\mathbf u_2=(-2,1,1)$, $\mathbf y=(1,2,3)$. Decompose $\mathbf y$.</summary><div>
+    <p>$\mathbf u_1\cdot\mathbf u_2=-4+5-1=0$, so the basis is orthogonal.
+    $$\hat{\mathbf y}=\tfrac{9}{30}\mathbf u_1+\tfrac36\mathbf u_2=\begin{bmatrix}-2/5\\2\\1/5\end{bmatrix},\qquad \mathbf z=\mathbf y-\hat{\mathbf y}=\begin{bmatrix}7/5\\0\\14/5\end{bmatrix}.$$
+    Check: $\mathbf z\cdot\mathbf u_1=\tfrac{14}5-\tfrac{14}5=0$ and $\mathbf z\cdot\mathbf u_2=-\tfrac{14}5+\tfrac{14}5=0$.</p>
+  </div></details>
+  <details><summary><span class="k">Example</span>Distance from $\mathbf y=(-1,-5,10)$ to $W=\operatorname{Span}\{(5,-2,1),(1,2,-1)\}$.</summary><div>
+    <p>$\hat{\mathbf y}=\tfrac{15}{30}\mathbf u_1+\tfrac{-21}{6}\mathbf u_2=(-1,-8,4)$ and $\mathbf y-\hat{\mathbf y}=(0,3,6)$, so the distance is $\sqrt{45}=3\sqrt5$.</p>
+  </div></details>
+
+  <h3>Traps</h3>
+  <ul class="traps">
+    <li>The projection formula requires an <strong>orthogonal</strong> basis. If you use a non-orthogonal basis, $\mathbf y-\hat{\mathbf y}$ will not be perpendicular to $W$, and the $\mathbf z\cdot\mathbf u_j$ check will catch it.</li>
+    <li>$\mathbf z=\mathbf y-\hat{\mathbf y}$ is $\operatorname{proj}_{W^\perp}\mathbf y$. The two projections always add to $\mathbf y$.</li>
+    <li>$UU^T$ is $n\times n$ (a projection), while $U^TU$ is $p\times p$ (the identity). Keep them apart.</li>
+    <li>For hand calculation, use formula (2) with an orthogonal basis. Formula (4) with unit vectors brings in square roots.</li>
+  </ul>
+
+  <h3>Self-check</h3>
+  <details><summary><span class="k">Try</span>$W=\operatorname{Span}\{(1,1,0),(-1,1,1)\}$ and $\mathbf y=(3,1,4)$. Find $\operatorname{proj}_W\mathbf y$ and the distance from $\mathbf y$ to $W$.</summary><div>
+    <p>The basis is orthogonal: $-1+1+0=0$. Then $\hat{\mathbf y}=\tfrac42(1,1,0)+\tfrac23(-1,1,1)=(\tfrac43,\tfrac83,\tfrac23)$ and $\mathbf z=(\tfrac53,-\tfrac53,\tfrac{10}3)$. Check: $\mathbf z\cdot\mathbf u_1=0$ and $\mathbf z\cdot\mathbf u_2=0$. The distance is $\tfrac53\sqrt6$.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>If $\mathbf y\in W^\perp$, what is $\operatorname{proj}_W\mathbf y$?</summary><div>
+    <p>$\mathbf 0$. Every $\mathbf y\cdot\mathbf u_j=0$, and the decomposition is $\mathbf y=\mathbf 0+\mathbf y$.</p>
+  </div></details>
+  <details><summary><span class="k">Try</span>$U$ is $4\times2$ with orthonormal columns. What sizes are $U^TU$ and $UU^T$, and which one equals $I$?</summary><div>
+    <p>$U^TU$ is $2\times2$ and equals $I_2$. $UU^T$ is $4\times4$ and is the projection onto $\operatorname{Col}U$, which is not $I_4$.</p>
+  </div></details>
+
+  <label class="check"><input type="checkbox" data-done="s63"> I can do this: decompose $\mathbf y=\hat{\mathbf y}+\mathbf z$, find the distance to $W$, and use $UU^T$.</label>
+</section>
+
+<!-- ───────────────────────── Sheet ───────────────────────── -->
+<section class="lesson" id="sheet" aria-labelledby="hsheet">
+  <p class="eyebrow">One page</p>
+  <h2 id="hsheet">Formula sheet</h2>
+  <div class="tscroll">
+  <table class="sheet">
+    <thead><tr><th scope="col">You want</th><th scope="col">Use</th><th scope="col">Needs</th></tr></thead>
+    <tbody>
+      <tr><td>Rotation hidden in real $2\times2$ $A$</td><td>$A=PCP^{-1}$, $P=[\operatorname{Re}\mathbf v\ \operatorname{Im}\mathbf v]$, $C=\begin{bmatrix}a&-b\\b&a\end{bmatrix}$</td><td>$\lambda=a-bi$, $b\ne0$</td></tr>
+      <tr><td>Scale factor and angle of $C$</td><td>$r=\sqrt{a^2+b^2}$, $\varphi=\arg(a+bi)$</td><td>—</td></tr>
+      <tr><td>Length / distance</td><td>$\|\mathbf v\|=\sqrt{\mathbf v\cdot\mathbf v}$, $\ \operatorname{dist}=\|\mathbf u-\mathbf v\|$</td><td>—</td></tr>
+      <tr><td>Test perpendicular</td><td>$\mathbf u\cdot\mathbf v=0\iff\|\mathbf u+\mathbf v\|^2=\|\mathbf u\|^2+\|\mathbf v\|^2$</td><td>—</td></tr>
+      <tr><td>$W^\perp$</td><td>$\operatorname{Nul}$ of the matrix whose rows span $W$</td><td>Spanning set of $W$</td></tr>
+      <tr><td>Coordinates of $\mathbf y\in W$</td><td>$c_j=\dfrac{\mathbf y\cdot\mathbf u_j}{\mathbf u_j\cdot\mathbf u_j}$</td><td>Orthogonal basis</td></tr>
+      <tr><td>Project onto $W$</td><td>$\hat{\mathbf y}=\sum\dfrac{\mathbf y\cdot\mathbf u_j}{\mathbf u_j\cdot\mathbf u_j}\mathbf u_j$</td><td>Orthogonal basis</td></tr>
+      <tr><td>Project, matrix form</td><td>$\hat{\mathbf y}=UU^T\mathbf y$</td><td>Orthonormal columns</td></tr>
+      <tr><td>Distance from $\mathbf y$ to $W$</td><td>$\|\mathbf y-\hat{\mathbf y}\|$</td><td>$\hat{\mathbf y}$ first</td></tr>
+      <tr><td>Inverse of orthogonal $U$</td><td>$U^{-1}=U^T$, $\det U=\pm1$</td><td>Square, orthonormal columns</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ───────────────────────── Quiz ───────────────────────── -->
+<section class="lesson" id="quiz" aria-labelledby="hquiz">
+  <p class="eyebrow">Mixed review</p>
+  <h2 id="hquiz">True or false?</h2>
+  <p>Pick an answer to see why. Your score updates as you go.</p>
+  <div class="quiz" id="qz"></div>
+  <div class="score"><span id="qscore" aria-live="polite">0 / 0 answered</span><button id="qreset">Clear answers</button></div>
+</section>
+
+<footer>Sources: Lay, <i>Linear Algebra</i>, Berkeley custom ed., §5.5 and §6.1–6.3. Box numbering follows the textbook.</footer>
+</main>
+
+<script>
+const KEY='m54guide-5563';
+let st={done:{},quiz:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s==='object')st=Object.assign(st,s)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+
+// "I can do this" ticks → dots in the strip
+const dots={};document.querySelectorAll('nav.strip a[data-sec]').forEach(a=>{const d=a.querySelector('.dot');if(d)dots[a.dataset.sec]=d});
+function paintDots(){for(const k in dots){const on=!!st.done[k];dots[k].classList.toggle('on',on);dots[k].parentElement.setAttribute('aria-label',`§${dots[k].parentElement.textContent.trim()}${on?' (done)':''}`)}}
+document.querySelectorAll('input[data-done]').forEach(cb=>{
+  cb.checked=!!st.done[cb.dataset.done];
+  cb.addEventListener('change',()=>{st.done[cb.dataset.done]=cb.checked;save();paintDots()});
+});
+paintDots();
+
+// Current-section highlight in the strip
+const links=[...document.querySelectorAll('nav.strip a[data-sec]')];
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.setAttribute('aria-current',String(l.dataset.sec===e.target.id)))}})},{rootMargin:'-30% 0px -60% 0px'});
+links.forEach(l=>{const s=document.getElementById(l.dataset.sec);if(s)io.observe(s)});
+
+// Quiz
+const Q=[
+ [String.raw`A real $2\times2$ matrix with eigenvalue $3-2i$ also has eigenvalue $3+2i$.`,true,String.raw`Real matrices have conjugate-pair eigenvalues: $A\bar{\mathbf x}=\bar\lambda\bar{\mathbf x}$.`],
+ [String.raw`If $A$ has eigenvalues $.6\pm.8i$, then $A^k\mathbf x_0$ spirals in toward $\mathbf 0$.`,false,String.raw`$|\lambda|=\sqrt{.36+.64}=1$, so the points stay on a closed ellipse.`],
+ [String.raw`Every real $3\times3$ matrix has at least one real eigenvalue.`,true,String.raw`The characteristic polynomial has degree 3, and complex roots come in pairs, so at least one root is real.`],
+ [String.raw`$\|\mathbf u+\mathbf v\|=\|\mathbf u\|+\|\mathbf v\|$ whenever $\mathbf u\perp\mathbf v$.`,false,String.raw`Only the squares add (Theorem 2). For $(1,0)$ and $(0,1)$: $\sqrt2\ne2$.`],
+ [String.raw`$(\operatorname{Col}A)^\perp=\operatorname{Nul}A$.`,false,String.raw`$(\operatorname{Col}A)^\perp=\operatorname{Nul}A^T$. It is $(\operatorname{Row}A)^\perp$ that equals $\operatorname{Nul}A$ (Theorem 3).`],
+ [String.raw`Every orthogonal set in $\mathbb R^n$ is linearly independent.`,false,String.raw`Not if it contains $\mathbf 0$. Theorem 4 requires nonzero vectors.`],
+ [String.raw`If $U$ is $5\times3$ with orthonormal columns, then $UU^T=I_5$.`,false,String.raw`$U^TU=I_3$, but $UU^T$ is the projection onto the 3-dimensional $\operatorname{Col}U$, not $I_5$.`],
+ [String.raw`A square matrix with orthonormal columns also has orthonormal rows.`,true,String.raw`$U^T=U^{-1}$, so $UU^T=I$ as well, and that says the rows are orthonormal.`],
+ [String.raw`If $\mathbf y\in W$, then $\operatorname{proj}_W\mathbf y=\mathbf y$.`,true,String.raw`The decomposition is $\mathbf y=\mathbf y+\mathbf 0$, and the decomposition is unique.`],
+ [String.raw`The projection formula $\sum\frac{\mathbf y\cdot\mathbf u_j}{\mathbf u_j\cdot\mathbf u_j}\mathbf u_j$ works for any basis of $W$.`,false,String.raw`Only for an orthogonal basis. Otherwise $\mathbf y-\hat{\mathbf y}$ is not perpendicular to $W$.`],
+ [String.raw`$\operatorname{proj}_W\mathbf y$ is the closest point in $W$ to $\mathbf y$.`,true,String.raw`This is the Best Approximation Theorem (Theorem 9).`],
+ [String.raw`If $\dim W=2$ in $\mathbb R^5$, then $\dim W^\perp=2$.`,false,String.raw`$\dim W+\dim W^\perp=n$, so $\dim W^\perp=3$.`],
+];
+const qz=document.getElementById('qz'),qscore=document.getElementById('qscore');
+function renderQuiz(){
+  qz.innerHTML='';
+  Q.forEach(([text,ans,why],i)=>{
+    const d=document.createElement('div');d.className='q';
+    const pick=st.quiz[i];
+    d.innerHTML=`<p>${text}</p><div class="btns" role="group" aria-label="Answer for statement ${i+1}"><button data-v="1">True</button><button data-v="0">False</button></div><p class="why" ${pick===undefined?'hidden':''}></p>`;
+    const whyEl=d.querySelector('.why');
+    d.querySelectorAll('button').forEach(b=>{
+      const v=b.dataset.v==='1';
+      b.setAttribute('aria-pressed',String(pick===v));
+      if(pick===v)b.classList.add(v===ans?'right':'wrong');
+      b.addEventListener('click',()=>{st.quiz[i]=v;save();renderQuiz();const nb=qz.children[i].querySelector(`button[data-v="${b.dataset.v}"]`);if(nb)nb.focus()});
+    });
+    if(pick!==undefined)whyEl.innerHTML=`<strong>${pick===ans?'Correct.':'Not quite.'}</strong> ${ans?'True':'False'}: ${why}`;
+    qz.appendChild(d);
+  });
+  const n=Object.keys(st.quiz).length,c=Object.entries(st.quiz).filter(([i,v])=>Q[i]&&Q[i][1]===v).length;
+  qscore.textContent=`${c} correct · ${n} / ${Q.length} answered`;
+  if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([qz]).catch(()=>{});
+}
+document.getElementById('qreset').addEventListener('click',()=>{st.quiz={};save();renderQuiz()});
+if(window.MathJax&&MathJax.startup&&MathJax.startup.promise)MathJax.startup.promise.then(renderQuiz);else renderQuiz();
+</script>
